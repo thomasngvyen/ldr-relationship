@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  displayName  String   @map("display_name")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  coupleAsA Couple? @relation("UserA")
+  coupleAsB Couple? @relation("UserB")
+
+  @@map("users")
+}
+
+model Couple {
+  id         String   @id @default(cuid())
+  inviteCode String   @unique @map("invite_code")
+  userAId    String   @unique @map("user_a_id")
+  userBId    String?  @unique @map("user_b_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  userA User  @relation("UserA", fields: [userAId], references: [id], map: "couples_user_a_fkey")
+  userB User? @relation("UserB", fields: [userBId], references: [id], map: "couples_user_b_fkey")
+
+  @@map("couples")
+}

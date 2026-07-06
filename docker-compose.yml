@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: ldr_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ldr
+      POSTGRES_PASSWORD: ldr_dev
+      POSTGRES_DB: ldr_app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
