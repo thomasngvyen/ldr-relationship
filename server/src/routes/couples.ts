@@ -13,7 +13,7 @@ const partnerSelect = {
   displayName: true,
 } as const;
 
-async function getCoupleForUser(userID: string) {
+export async function getCoupleForUser(userID: string) {
   const user = await prisma.user.findUnique({
     where: { id: userID },
     include: { coupleAsA: true, coupleAsB: true },

@@ -29,5 +29,18 @@ model Couple {
   userA User  @relation("UserA", fields: [userAId], references: [id], map: "couples_user_a_fkey")
   userB User? @relation("UserB", fields: [userBId], references: [id], map: "couples_user_b_fkey")
 
+  visits Visit[] @relation("CoupleVisits")
+
   @@map("couples")
+}
+
+model Visit {
+  id         String   @id @default(cuid())
+  start_date DateTime @map("start_date")
+  end_date   DateTime @map("end_date")
+  coupleId   String   @map("couple_id")
+  couple     Couple   @relation("CoupleVisits", fields: [coupleId], references: [id], map: "visits_couple_fkey")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("visits")
 }
