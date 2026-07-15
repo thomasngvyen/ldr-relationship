@@ -18,10 +18,11 @@ export const client = async (endpoint, { body, ...customConfig } = {}) => {
     }
     try{
         const response = await fetch(`${BASE_URL}${endpoint}`, config);
+        const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-            throw new Error('Failed to fetch');
+            throw new Error(data.error ?? 'Request failed');
         }
-        return await response.json();
+        return data;
     } catch (error) {
         console.error('Error:', error);
         throw error;
