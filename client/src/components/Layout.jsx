@@ -1,13 +1,25 @@
 import StaggeredMenu from './StaggeredMenu'
-import reactLogo from '../assets/react.svg'
+import { useAuth } from '../context/AuthContext'
 
-const menuItems = [
+const publicMenuItems = [
   { label: 'Login', ariaLabel: 'Go to login page', link: '/login' },
   { label: 'Register', ariaLabel: 'Create an account', link: '/register' },
-  { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
 ]
 
+const authedMenuItems = [
+  { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
+  { label: 'Pair', ariaLabel: 'Connect with your partner', link: '/pair' },
+]
+
+/**
+ * @param {Object} props
+ * @param {React.ReactNode} props.children
+ * @returns {React.ReactNode}
+ */
 export default function Layout({ children }) {
+  const { user } = useAuth()
+  const menuItems = user ? authedMenuItems : publicMenuItems
+
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white">
       <StaggeredMenu
@@ -20,7 +32,6 @@ export default function Layout({ children }) {
         openMenuButtonColor="#fff"
         changeMenuColorOnOpen
         colors={['#E8B4F8', '#aa3bff']}
-        logoUrl={reactLogo}
         accentColor="#aa3bff"
       />
       <main className="relative z-0 px-6 pb-12 pt-24">{children}</main>

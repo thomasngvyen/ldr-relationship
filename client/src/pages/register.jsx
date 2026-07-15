@@ -22,7 +22,7 @@ export default function Register() {
 
     try {
       await registerUser({ displayName, email, password })
-      navigate('/dashboard')
+      navigate('/pair')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not create your account. Please try again.';
       setError(message)

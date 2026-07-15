@@ -21,7 +21,7 @@ export default function Login() {
 
     try {
       await login({ email, password })
-      navigate('/dashboard')
+      navigate('/pair')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Invalid email or password. Please try again.';
       setError(message)

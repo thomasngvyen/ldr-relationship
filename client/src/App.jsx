@@ -1,7 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
+import ProtectedRoute from './components/ProtectedRoute'
 import Dashboard from './pages/dashboard'
 import Login from './pages/login'
+import Pair from './pages/pair'
 import Register from './pages/register'
 
 function App() {
@@ -11,7 +13,22 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pair"
+          element={
+            <ProtectedRoute>
+              <Pair />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Layout>
   )

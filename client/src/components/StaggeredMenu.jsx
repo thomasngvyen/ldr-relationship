@@ -6,11 +6,11 @@ import './StaggeredMenu.css'
 export default function StaggeredMenu({
   position = 'right',
   colors = ['#B497CF', '#5227FF'],
-  items = [],
-  socialItems = [],
+  items = /** @type {Array<{ label: string, link: string, ariaLabel: string }>} */ ([]),
+  socialItems = /** @type {Array<{ label: string, link: string }>} */ ([]),
   displaySocials = true,
   displayItemNumbering = true,
-  className,
+  className = '',
   logoUrl = '/src/assets/logos/reactbits-gh-white.svg',
   menuButtonColor = '#fff',
   openMenuButtonColor = '#fff',
@@ -18,8 +18,8 @@ export default function StaggeredMenu({
   accentColor = '#5227FF',
   isFixed = false,
   closeOnClickAway = true,
-  onMenuOpen,
-  onMenuClose,
+  onMenuOpen = /** @type {() => void} */ (() => {}),
+  onMenuClose = /** @type {() => void} */ (() => {}),
 }) {
   const [open, setOpen] = useState(false)
   const openRef = useRef(false)

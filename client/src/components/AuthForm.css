@@ -289,3 +289,135 @@
   font-size: 0.9rem;
   text-align: center;
 }
+
+.auth-muted {
+  margin: 0;
+  color: #9d174d;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.auth-muted--small {
+  font-size: 0.82rem;
+}
+
+.auth-pair-actions,
+.auth-pair-waiting,
+.auth-pair-success,
+.auth-pair-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.auth-mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(244, 114, 182, 0.2);
+}
+
+.auth-mode-btn {
+  padding: 0.7rem 0.85rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #9d174d;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.auth-mode-btn.is-active {
+  background: linear-gradient(120deg, #f472b6, #fb7185);
+  color: white;
+  box-shadow: 0 8px 20px rgba(244, 114, 182, 0.28);
+}
+
+.auth-invite-code {
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px dashed rgba(244, 114, 182, 0.45);
+  background: rgba(255, 255, 255, 0.88);
+  color: #831843;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  word-break: break-all;
+  text-align: center;
+}
+
+.auth-secondary-btn,
+.auth-inline-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.auth-secondary-btn {
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(244, 114, 182, 0.28);
+  color: #be185d;
+  font-weight: 700;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.auth-secondary-btn:hover {
+  transform: translateY(-2px);
+  background: white;
+  box-shadow: 0 10px 24px rgba(244, 114, 182, 0.18);
+}
+
+.auth-inline-btn {
+  padding: 0;
+  color: #be185d;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.auth-pair-success {
+  text-align: center;
+}
+
+.auth-pair-avatar {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f472b6, #fb7185);
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 700;
+  box-shadow: 0 16px 32px rgba(244, 114, 182, 0.35);
+}
+
+.auth-pair-name {
+  margin: 0;
+  color: #831843;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.auth-submit-btn--link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
