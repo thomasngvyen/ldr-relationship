@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import CountdownTimer from '../components/CountdownTimer'
 import VisitCard from '../components/VisitCard'
 import VisitForm from '../components/VisitForm'
+import './Dashboard.css'
 
 /**
  * @typedef {Object} CoupleStatus
@@ -136,89 +137,88 @@ export default function Dashboard() {
   const displayName = /** @type {{ displayName?: string } | null} */ (user)?.displayName
 
   return (
-    <section className="mx-auto max-w-2xl">
-      <h1 className="text-3xl font-semibold">
-        Welcome{displayName ? `, ${displayName}` : ''}
-      </h1>
+    <div className="dashboard-page">
+      <div className="dashboard-page__orb dashboard-page__orb--one" aria-hidden="true" />
+      <div className="dashboard-page__orb dashboard-page__orb--two" aria-hidden="true" />
 
-      {loading ? (
-        <p className="mt-2 text-white/70">Loading your space...</p>
-      ) : !status?.paired ? (
-        <p className="mt-2 text-white/70">
-          You are not paired yet.{' '}
-          <Link to="/pair" className="text-[#f9a8d4] underline underline-offset-2">
-            Connect with your partner
-          </Link>{' '}
-          to unlock your shared dashboard.
-        </p>
-      ) : (
-        <div className="mt-4 space-y-6">
-          <p className="text-white/70">
-            Paired with{' '}
-            <span className="text-[#f9a8d4]">{status.partner?.displayName}</span>.
+      <section className="dashboard-page__content">
+        <h1 className="dashboard-page__title">
+          Welcome{displayName ? `, ${displayName}` : ''}
+        </h1>
+
+        {loading ? (
+          <p className="dashboard-page__text">Loading your space...</p>
+        ) : !status?.paired ? (
+          <p className="dashboard-page__text">
+            You are not paired yet.{' '}
+            <Link to="/pair" className="dashboard-page__link">
+              Connect with your partner
+            </Link>{' '}
+            to unlock your shared dashboard.
           </p>
-
-          {visitsError ? (
-            <p className="rounded-xl border border-pink-400/30 bg-pink-950/40 px-4 py-3 text-sm text-pink-200">
-              {visitsError}
+        ) : (
+          <div className="dashboard-page__stack">
+            <p className="dashboard-page__text" style={{ margin: 0 }}>
+              Paired with{' '}
+              <span className="dashboard-page__accent">{status.partner?.displayName}</span>.
             </p>
-          ) : null}
 
-          {nextVisit ? (
-            <div className="space-y-6">
-              <div>
-                <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-[#f9a8d4]">
-                  Until you see each other
-                </p>
-                <CountdownTimer targetDate={nextVisit.start_date} />
+            {visitsError ? <p className="dashboard-page__error">{visitsError}</p> : null}
+
+            {nextVisit ? (
+              <div className="dashboard-page__stack">
+                <div>
+                  <p className="dashboard-page__label">Until you see each other</p>
+                  <CountdownTimer targetDate={nextVisit.start_date} />
+                </div>
+
+                <VisitCard
+                  visit={nextVisit}
+                  onEdit={() => {
+                    setEditing(true)
+                    setShowForm(true)
+                  }}
+                  onDelete={handleDeleteVisit}
+                  deleting={deleting}
+                />
               </div>
+            ) : (
+              <p className="dashboard-page__text" style={{ margin: 0 }}>
+                No upcoming visit yet. Plan one below so your countdown can start.
+              </p>
+            )}
 
-              <VisitCard
-                visit={nextVisit}
-                onEdit={() => {
-                  setEditing(true)
+            {showForm ? (
+              <VisitForm
+                key={editing && nextVisit ? nextVisit.id : 'new-visit'}
+                initialValues={editing && nextVisit ? nextVisit : null}
+                onSubmit={handleSaveVisit}
+                onCancel={
+                  nextVisit
+                    ? () => {
+                        setShowForm(false)
+                        setEditing(false)
+                      }
+                    : undefined
+                }
+                submitting={submitting}
+                submitLabel={editing ? 'Update visit' : 'Plan visit'}
+              />
+            ) : (
+              <button
+                type="button"
+                className="dashboard-page__cta"
+                onClick={() => {
+                  setEditing(false)
                   setShowForm(true)
                 }}
-                onDelete={handleDeleteVisit}
-                deleting={deleting}
-              />
-            </div>
-          ) : (
-            <p className="text-white/70">
-              No upcoming visit yet. Plan one below so your countdown can start.
-            </p>
-          )}
-
-          {showForm ? (
-            <VisitForm
-              key={editing && nextVisit ? nextVisit.id : 'new-visit'}
-              initialValues={editing && nextVisit ? nextVisit : null}
-              onSubmit={handleSaveVisit}
-              onCancel={
-                nextVisit
-                  ? () => {
-                      setShowForm(false)
-                      setEditing(false)
-                    }
-                  : undefined
-              }
-              submitting={submitting}
-              submitLabel={editing ? 'Update visit' : 'Plan visit'}
-            />
-          ) : (
-            <button
-              type="button"
-              className="w-full rounded-full bg-gradient-to-r from-pink-400 via-rose-400 to-pink-300 px-5 py-3 font-bold text-white shadow-lg shadow-pink-500/30 transition hover:-translate-y-0.5"
-              onClick={() => {
-                setEditing(false)
-                setShowForm(true)
-              }}
-            >
-              Plan another visit
-            </button>
-          )}
-        </div>
-      )}
-    </section>
+              >
+                Plan another visit
+              </button>
+            )}
+          </div>
+        )}
+      </section>
+    </div>
   )
 }
