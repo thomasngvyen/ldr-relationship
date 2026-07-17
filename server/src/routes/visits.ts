@@ -86,24 +86,26 @@ router.patch('/:id', authMiddleware, zodValidator(visitUpdateSchema), async (req
         if (!couple) {
             return res.status(404).json({ error: 'Couple not found' });
         }
-        const visit = await prisma.visit.update({
+
+        const existing = await prisma.visit.findFirst({
             where: {
-                id: req.params.id as string, 
+                id: req.params.id as string,
                 coupleId: couple.id,
             },
+        });
+
+        if (!existing) {
+            return res.status(404).json({ error: 'Visit not found' });
+        }
+
+        const visit = await prisma.visit.update({
+            where: { id: existing.id },
             data: {
-                start_date: req.body.start_date,
-                end_date: req.body.end_date,
+                ...(req.body.start_date !== undefined ? { start_date: req.body.start_date } : {}),
+                ...(req.body.end_date !== undefined ? { end_date: req.body.end_date } : {}),
             },
-            include: {
-                couple: {
-                    select: {
-                        id: true,
-                    }
-                }
-            }
-        })
-        return res.status(200).json({ visit: visit, message: 'Visit updated successfully' });
+        });
+        return res.status(200).json({ visit, message: 'Visit updated successfully' });
     }
     catch (error) {
         return res.status(500).json({ error: 'Failed to update visit' });
@@ -117,20 +119,22 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         if (!couple) {
             return res.status(404).json({ error: 'Couple not found' });
         }
-        const visit = await prisma.visit.delete({
+
+        const existing = await prisma.visit.findFirst({
             where: {
                 id: req.params.id as string,
                 coupleId: couple.id,
             },
-            include: {
-                couple: {
-                    select: {
-                        id: true,
-                    }
-                }
-            }
-        })
-        return res.status(200).json({ visit: visit, message: 'Visit deleted successfully' });
+        });
+
+        if (!existing) {
+            return res.status(404).json({ error: 'Visit not found' });
+        }
+
+        const visit = await prisma.visit.delete({
+            where: { id: existing.id },
+        });
+        return res.status(200).json({ visit, message: 'Visit deleted successfully' });
     }
     catch (error) {
         return res.status(500).json({ error: 'Failed to delete visit' });
