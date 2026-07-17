@@ -6,7 +6,7 @@ import './StaggeredMenu.css'
 export default function StaggeredMenu({
   position = 'right',
   colors = ['#B497CF', '#5227FF'],
-  items = /** @type {Array<{ label: string, link: string, ariaLabel: string }>} */ ([]),
+  items = /** @type {Array<{ label: string, link?: string, ariaLabel: string, onClick?: () => void }>} */ ([]),
   socialItems = /** @type {Array<{ label: string, link: string }>} */ ([]),
   displaySocials = true,
   displayItemNumbering = true,
@@ -23,23 +23,38 @@ export default function StaggeredMenu({
 }) {
   const [open, setOpen] = useState(false)
   const openRef = useRef(false)
+  /** @type {React.MutableRefObject<HTMLElement | null>} */
   const panelRef = useRef(null)
+  /** @type {React.MutableRefObject<HTMLDivElement | null>} */
   const preLayersRef = useRef(null)
+  /** @type {React.MutableRefObject<Element[]>} */
   const preLayerElsRef = useRef([])
+  /** @type {React.MutableRefObject<HTMLElement | null>} */
   const plusHRef = useRef(null)
+  /** @type {React.MutableRefObject<HTMLElement | null>} */
   const plusVRef = useRef(null)
+  /** @type {React.MutableRefObject<HTMLElement | null>} */
   const iconRef = useRef(null)
+  /** @type {React.MutableRefObject<HTMLElement | null>} */
   const textInnerRef = useRef(null)
+  /** @type {React.MutableRefObject<HTMLElement | null>} */
   const textWrapRef = useRef(null)
   const [textLines, setTextLines] = useState(['Menu', 'Close'])
 
+  /** @type {React.MutableRefObject<gsap.core.Timeline | null>} */
   const openTlRef = useRef(null)
+  /** @type {React.MutableRefObject<gsap.core.Tween | null>} */
   const closeTweenRef = useRef(null)
+  /** @type {React.MutableRefObject<gsap.core.Tween | null>} */
   const spinTweenRef = useRef(null)
+  /** @type {React.MutableRefObject<gsap.core.Tween | null>} */
   const textCycleAnimRef = useRef(null)
+  /** @type {React.MutableRefObject<gsap.core.Tween | null>} */
   const colorTweenRef = useRef(null)
+  /** @type {React.MutableRefObject<HTMLButtonElement | null>} */
   const toggleBtnRef = useRef(null)
   const busyRef = useRef(false)
+  /** @type {React.MutableRefObject<gsap.core.Tween | null>} */
   const itemEntranceTweenRef = useRef(null)
 
   useLayoutEffect(() => {
@@ -52,6 +67,7 @@ export default function StaggeredMenu({
       const textInner = textInnerRef.current
       if (!panel || !plusH || !plusV || !icon || !textInner) return
 
+      /** @type {Element[]} */
       let preLayers = []
       if (preContainer) {
         preLayers = Array.from(preContainer.querySelectorAll('.sm-prelayer'))
@@ -242,7 +258,9 @@ export default function StaggeredMenu({
     })
   }, [position])
 
-  const animateIcon = useCallback((opening) => {
+  const animateIcon = useCallback(
+    /** @param {boolean} opening */
+    (opening) => {
     const icon = iconRef.current
     if (!icon) return
     spinTweenRef.current?.kill()
@@ -264,6 +282,9 @@ export default function StaggeredMenu({
   }, [])
 
   const animateColor = useCallback(
+    /**
+     * @param {boolean} opening
+     */
     (opening) => {
       const btn = toggleBtnRef.current
       if (!btn) return
@@ -294,7 +315,9 @@ export default function StaggeredMenu({
     }
   }, [changeMenuColorOnOpen, menuButtonColor, openMenuButtonColor])
 
-  const animateText = useCallback((opening) => {
+  const animateText = useCallback(
+    /** @param {boolean} opening */
+    (opening) => {
     const inner = textInnerRef.current
     if (!inner) return
     textCycleAnimRef.current?.kill()
@@ -353,12 +376,17 @@ export default function StaggeredMenu({
   useEffect(() => {
     if (!closeOnClickAway || !open) return
 
+    /**
+     * @param {MouseEvent} event
+     */
     const handleClickOutside = (event) => {
+      const target = /** @type {Node | null} */ (event.target)
       if (
         panelRef.current &&
-        !panelRef.current.contains(event.target) &&
+        target &&
+        !panelRef.current.contains(target) &&
         toggleBtnRef.current &&
-        !toggleBtnRef.current.contains(event.target)
+        !toggleBtnRef.current.contains(target)
       ) {
         closeMenu()
       }
@@ -383,7 +411,11 @@ export default function StaggeredMenu({
   return (
     <div
       className={`${className ? `${className} ` : ''}staggered-menu-wrapper${isFixed ? ' fixed-wrapper' : ''}`}
-      style={accentColor ? { '--sm-accent': accentColor } : undefined}
+      style={
+        accentColor
+          ? /** @type {React.CSSProperties} */ ({ '--sm-accent': accentColor })
+          : undefined
+      }
       data-position={position}
       data-open={open || undefined}
     >
@@ -441,15 +473,30 @@ export default function StaggeredMenu({
             {items.length ? (
               items.map((it, idx) => (
                 <li className="sm-panel-itemWrap" key={it.label + idx}>
-                  <Link
-                    className="sm-panel-item"
-                    to={it.link}
-                    aria-label={it.ariaLabel}
-                    data-index={idx + 1}
-                    onClick={closeMenu}
-                  >
-                    <span className="sm-panel-itemLabel">{it.label}</span>
-                  </Link>
+                  {it.onClick ? (
+                    <button
+                      type="button"
+                      className="sm-panel-item"
+                      aria-label={it.ariaLabel}
+                      data-index={idx + 1}
+                      onClick={() => {
+                        closeMenu()
+                        it.onClick?.()
+                      }}
+                    >
+                      <span className="sm-panel-itemLabel">{it.label}</span>
+                    </button>
+                  ) : (
+                    <Link
+                      className="sm-panel-item"
+                      to={it.link ?? '/'}
+                      aria-label={it.ariaLabel}
+                      data-index={idx + 1}
+                      onClick={closeMenu}
+                    >
+                      <span className="sm-panel-itemLabel">{it.label}</span>
+                    </Link>
+                  )}
                 </li>
               ))
             ) : (

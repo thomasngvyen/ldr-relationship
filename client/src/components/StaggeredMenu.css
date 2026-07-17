@@ -282,6 +282,10 @@
   display: inline-block;
   text-decoration: none;
   padding-right: 1.4em;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
 }
 
 .staggered-menu-panel .sm-socials-list .sm-socials-link {

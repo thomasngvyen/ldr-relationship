@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import StaggeredMenu from './StaggeredMenu'
 import { useAuth } from '../context/AuthContext'
 
@@ -6,18 +7,28 @@ const publicMenuItems = [
   { label: 'Register', ariaLabel: 'Create an account', link: '/register' },
 ]
 
-const authedMenuItems = [
-  { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
-  { label: 'Pair', ariaLabel: 'Connect with your partner', link: '/pair' },
-]
-
 /**
  * @param {Object} props
  * @param {React.ReactNode} props.children
  * @returns {React.ReactNode}
  */
 export default function Layout({ children }) {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const authedMenuItems = [
+    { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
+    { label: 'Pair', ariaLabel: 'Connect with your partner', link: '/pair' },
+    {
+      label: 'Log out',
+      ariaLabel: 'Log out of your account',
+      onClick: () => {
+        logout()
+        navigate('/login')
+      },
+    },
+  ]
+
   const menuItems = user ? authedMenuItems : publicMenuItems
 
   return (
