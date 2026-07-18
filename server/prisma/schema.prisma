@@ -44,3 +44,27 @@ model Visit {
 
   @@map("visits")
 }
+
+enum Mood {
+  HAPPY
+  SAD
+  ANGRY
+  EXCITED
+  CONFUSED
+  BORED
+  TIRED
+  SICK
+  STRESSED
+  RELAXED
+  HORNY
+  SLEEPY
+}
+
+model MoodMessage {
+  id String @id @default(cuid())
+  mood Mood
+  message String
+  createdAt DateTime @default(now())
+
+  @@map("mood_messages")
+}
