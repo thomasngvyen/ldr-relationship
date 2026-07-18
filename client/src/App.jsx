@@ -5,6 +5,7 @@ import Dashboard from './pages/dashboard'
 import Login from './pages/login'
 import Pair from './pages/pair'
 import Register from './pages/register'
+import Visits from './pages/visits'
 
 function App() {
   return (
@@ -26,6 +27,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Pair />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/visits"
+          element={
+            <ProtectedRoute>
+              <Visits />
             </ProtectedRoute>
           }
         />
