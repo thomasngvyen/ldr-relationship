@@ -15,7 +15,7 @@ model User {
 
   coupleAsA Couple? @relation("UserA")
   coupleAsB Couple? @relation("UserB")
-
+  moodMessages MoodMessage[] @relation("UserMoodMessages")
   @@map("users")
 }
 
@@ -65,6 +65,7 @@ model MoodMessage {
   mood Mood
   message String
   createdAt DateTime @default(now())
-
+  userId String @map("user_id")
+  user User @relation("UserMoodMessages", fields: [userId], references: [id])
   @@map("mood_messages")
 }

@@ -7,9 +7,10 @@ dotenv.config();
 import authRouter from './routes/auth';
 import couplesRouter from './routes/couples';
 import visitsRouter from './routes/visits';
-
-import {authMiddleware} from './middleware/auth';
-import {requireCouple} from './middleware/requireCouple';
+import moodMessagesRouter from './routes/moodMessages';
+import moodsRouter from './routes/moods';
+import { authMiddleware } from './middleware/auth';
+import { requireCouple } from './middleware/requireCouple';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +20,8 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/couples', couplesRouter);
 app.use('/api/visits', authMiddleware, requireCouple, visitsRouter);
+app.use('/api/moods', authMiddleware, requireCouple, moodsRouter);
+app.use('/api/moodMessages', authMiddleware, requireCouple, moodMessagesRouter);
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
