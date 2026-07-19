@@ -7,6 +7,7 @@ import Pair from './pages/pair'
 import Register from './pages/register'
 import Visits from './pages/visits'
 import Moods from './pages/moods'
+import ManageMessages from './pages/ManageMessages'
 
 function App() {
   return (
@@ -44,6 +45,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Moods />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages/manage"
+          element={
+            <ProtectedRoute>
+              <ManageMessages />
             </ProtectedRoute>
           }
         />

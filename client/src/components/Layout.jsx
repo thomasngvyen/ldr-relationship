@@ -20,6 +20,7 @@ export default function Layout({ children }) {
     { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
     { label: 'Visits', ariaLabel: 'View and plan visits', link: '/visits' },
     { label: 'Moods', ariaLabel: 'Open mood messages', link: '/moods' },
+    { label: 'Messages', ariaLabel: 'Manage mood message library', link: '/messages/manage' },
     { label: 'Pair', ariaLabel: 'Connect with your partner', link: '/pair' },
     {
       label: 'Log out',

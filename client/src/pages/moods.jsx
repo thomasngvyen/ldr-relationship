@@ -139,6 +139,10 @@ export default function Moods() {
             </div>
 
             <p className="dashboard-page__text" style={{ margin: 0, textAlign: 'center' }}>
+              <Link to="/messages/manage" className="dashboard-page__link">
+                Manage message library
+              </Link>
+              {' · '}
               <Link to="/dashboard" className="dashboard-page__link">
                 Back to dashboard
               </Link>
