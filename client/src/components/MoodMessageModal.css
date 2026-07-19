@@ -1,0 +1,135 @@
+.mood-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  animation: mood-modal-fade 0.25s ease both;
+}
+
+.mood-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(80, 7, 36, 0.35);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.mood-modal__card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 420px);
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.85rem 1.6rem 1.5rem;
+  border-radius: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 28px 70px rgba(244, 114, 182, 0.28),
+    0 2px 0 rgba(255, 255, 255, 0.95) inset;
+  animation: mood-modal-rise 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mood-modal__badge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fce7f3, #ffe4e6);
+  color: #be185d;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mood-modal__title {
+  margin: 0;
+  color: #831843;
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.mood-modal__body {
+  margin: 0.25rem 0 0;
+  color: #500724;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.mood-modal__body--muted {
+  color: #9d174d;
+  opacity: 0.85;
+}
+
+.mood-modal__error {
+  margin: 0.25rem 0 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  background: rgba(190, 24, 93, 0.08);
+  border: 1px solid rgba(190, 24, 93, 0.18);
+  color: #9d174d;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.mood-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+.mood-modal__btn {
+  flex: 1;
+  min-width: 7rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.mood-modal__btn:hover {
+  transform: translateY(-2px);
+}
+
+.mood-modal__btn--primary {
+  border: none;
+  background: linear-gradient(120deg, #f472b6 0%, #fb7185 50%, #f9a8d4 100%);
+  color: white;
+  box-shadow: 0 12px 28px rgba(244, 114, 182, 0.35);
+}
+
+.mood-modal__btn--ghost {
+  border: 1px solid rgba(244, 114, 182, 0.35);
+  background: rgba(255, 255, 255, 0.85);
+  color: #be185d;
+}
+
+@keyframes mood-modal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mood-modal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

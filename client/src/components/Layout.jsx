@@ -19,6 +19,7 @@ export default function Layout({ children }) {
   const authedMenuItems = [
     { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
     { label: 'Visits', ariaLabel: 'View and plan visits', link: '/visits' },
+    { label: 'Moods', ariaLabel: 'Open mood messages', link: '/moods' },
     { label: 'Pair', ariaLabel: 'Connect with your partner', link: '/pair' },
     {
       label: 'Log out',

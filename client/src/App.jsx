@@ -6,6 +6,7 @@ import Login from './pages/login'
 import Pair from './pages/pair'
 import Register from './pages/register'
 import Visits from './pages/visits'
+import Moods from './pages/moods'
 
 function App() {
   return (
@@ -35,6 +36,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Visits />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/moods"
+          element={
+            <ProtectedRoute>
+              <Moods />
             </ProtectedRoute>
           }
         />
