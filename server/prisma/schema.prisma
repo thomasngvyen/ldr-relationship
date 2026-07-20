@@ -16,6 +16,8 @@ model User {
   coupleAsA Couple? @relation("UserA")
   coupleAsB Couple? @relation("UserB")
   moodMessages MoodMessage[] @relation("UserMoodMessages")
+  dateIdeas DateIdea[] @relation("UserDateIdeas")
+  dateIdeaVotes DateIdeaVote[] @relation("UserDateIdeaVotes")
   @@map("users")
 }
 
@@ -30,6 +32,7 @@ model Couple {
   userB User? @relation("UserB", fields: [userBId], references: [id], map: "couples_user_b_fkey")
 
   visits Visit[] @relation("CoupleVisits")
+  dateIdeas DateIdea[] @relation("CoupleDateIdeas")
 
   @@map("couples")
 }
@@ -68,4 +71,52 @@ model MoodMessage {
   userId String @map("user_id")
   user User @relation("UserMoodMessages", fields: [userId], references: [id])
   @@map("mood_messages")
+}
+
+model DateIdea {
+  id          String           @id @default(cuid())
+  title       String
+  description String
+  category    DateIdeaCategory
+  status      DateIdeaStatus   @default(IDEA)
+  coupleId    String           @map("couple_id")
+  userId      String           @map("user_id") // creator
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  couple Couple         @relation("CoupleDateIdeas", fields: [coupleId], references: [id], map: "date_ideas_couple_fkey")
+  user   User           @relation("UserDateIdeas", fields: [userId], references: [id], map: "date_ideas_user_fkey")
+  votes  DateIdeaVote[] @relation("DateIdeaVotes")
+
+  @@map("date_ideas")
+}
+
+enum DateIdeaCategory {
+  OUTDOOR
+  INDOOR
+  ACTIVE
+  CASUAL
+  ROMANTIC
+  ADVENTUROUS
+  COZY
+}
+
+enum DateIdeaStatus {
+  IDEA
+  VOTED
+  SELECTED
+  COMPLETED
+}
+
+model DateIdeaVote {
+  id         String   @id @default(cuid())
+  dateIdeaId String   @map("date_idea_id")
+  userId     String   @map("user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  dateIdea DateIdea @relation("DateIdeaVotes", fields: [dateIdeaId], references: [id], map: "date_idea_votes_date_idea_fkey", onDelete: Cascade)
+  user     User     @relation("UserDateIdeaVotes", fields: [userId], references: [id], map: "date_idea_votes_user_fkey")
+
+  @@unique([dateIdeaId, userId])
+  @@map("date_idea_votes")
 }
