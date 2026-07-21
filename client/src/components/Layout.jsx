@@ -21,6 +21,7 @@ export default function Layout({ children }) {
     { label: 'Visits', ariaLabel: 'View and plan visits', link: '/visits' },
     { label: 'Moods', ariaLabel: 'Open mood messages', link: '/moods' },
     { label: 'Messages', ariaLabel: 'Manage mood message library', link: '/messages/manage' },
+    { label: 'Date ideas', ariaLabel: 'Browse and vote on date ideas', link: '/date-ideas' },
     { label: 'Pair', ariaLabel: 'Connect with your partner', link: '/pair' },
     {
       label: 'Log out',

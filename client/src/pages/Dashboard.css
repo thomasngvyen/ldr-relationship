@@ -57,6 +57,10 @@
   margin: 0 auto;
 }
 
+.dashboard-page__content--wide {
+  max-width: 72rem;
+}
+
 .dashboard-page__title {
   margin: 0;
   color: #831843;
