@@ -11,7 +11,7 @@ import moodMessagesRouter from './routes/moodMessages';
 import moodsRouter from './routes/moods';
 import { authMiddleware } from './middleware/auth';
 import { requireCouple } from './middleware/requireCouple';
-
+import dateIdeasRouter from './routes/dateIdeas';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -22,6 +22,7 @@ app.use('/api/couples', couplesRouter);
 app.use('/api/visits', authMiddleware, requireCouple, visitsRouter);
 app.use('/api/moods', authMiddleware, requireCouple, moodsRouter);
 app.use('/api/moodMessages', authMiddleware, requireCouple, moodMessagesRouter);
+app.use('/api/dateIdeas', authMiddleware, requireCouple, dateIdeasRouter);
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
