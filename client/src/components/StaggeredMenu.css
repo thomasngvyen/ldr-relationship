@@ -40,11 +40,28 @@
   user-select: none;
 }
 
+.sm-logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+
 .sm-logo-img {
   display: block;
-  height: 32px;
-  width: auto;
-  object-fit: contain;
+  height: 36px;
+  width: 36px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.sm-logo-text {
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: color 0.25s ease;
 }
 
 .sm-toggle {
@@ -271,7 +288,8 @@
   position: relative;
   color: #000;
   font-weight: 600;
-  font-size: 3.5rem;
+  font-size: clamp(2.25rem, 4vw, 3rem);
+  white-space: nowrap;
   cursor: pointer;
   line-height: 1;
   letter-spacing: -2px;
@@ -342,8 +360,8 @@
     right: 0;
   }
 
-  .staggered-menu-wrapper[data-open] .sm-logo-img {
-    filter: invert(100%);
+  .staggered-menu-wrapper[data-open] .sm-logo-text {
+    color: #1a1a1a;
   }
 }
 
@@ -354,7 +372,7 @@
     right: 0;
   }
 
-  .staggered-menu-wrapper[data-open] .sm-logo-img {
-    filter: invert(100%);
+  .staggered-menu-wrapper[data-open] .sm-logo-text {
+    color: #1a1a1a;
   }
 }

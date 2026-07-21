@@ -11,7 +11,7 @@ export default function StaggeredMenu({
   displaySocials = true,
   displayItemNumbering = true,
   className = '',
-  logoUrl = '/src/assets/logos/reactbits-gh-white.svg',
+  logoUrl = '/heartsync-logo.png',
   menuButtonColor = '#fff',
   openMenuButtonColor = '#fff',
   changeMenuColorOnOpen = true,
@@ -426,15 +426,16 @@ export default function StaggeredMenu({
       </div>
       <header className="staggered-menu-header" aria-label="Main navigation header">
         <div className="sm-logo" aria-label="Logo">
-          <Link to="/dashboard" onClick={closeMenu}>
+          <Link to="/dashboard" onClick={closeMenu} className="sm-logo-link">
             <img
               src={logoUrl}
-              alt="LDR App"
+              alt="HeartSync"
               className="sm-logo-img"
               draggable={false}
-              width={110}
-              height={24}
+              width={36}
+              height={36}
             />
+            <span className="sm-logo-text">HeartSync</span>
           </Link>
         </div>
         <button
