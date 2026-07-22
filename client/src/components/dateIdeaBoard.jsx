@@ -3,6 +3,8 @@ import { client } from '../api/client'
 import { STATUS_COLUMNS, statusToColumn } from '../constants/dateIdeas'
 import DateIdeaCard from './dateIdeaCard'
 import DateIdeaForm from './dateIdeaForm'
+import ErrorBanner from './ErrorBanner'
+import LoadingSpinner from './LoadingSpinner'
 import './DateIdeaComponents.css'
 
 /** @typedef {import('./dateIdeaCard').DateIdea} DateIdea */
@@ -159,16 +161,12 @@ export default function DateIdeaBoard() {
   }
 
   if (loading) {
-    return (
-      <p className="dashboard-page__text" style={{ margin: 0 }}>
-        Loading your date ideas...
-      </p>
-    )
+    return <LoadingSpinner label="Loading your date ideas..." />
   }
 
   return (
     <div className="dashboard-page__stack">
-      {error ? <p className="dashboard-page__error">{error}</p> : null}
+      <ErrorBanner message={error} onDismiss={() => setError(null)} />
 
       {showForm ? (
         <DateIdeaForm

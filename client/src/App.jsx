@@ -7,7 +7,7 @@ import Pair from './pages/pair'
 import Register from './pages/register'
 import Visits from './pages/visits'
 import Moods from './pages/moods'
-import ManageMessages from './pages/managemessages'
+import ManageMessages from './pages/ManageMessages'
 import DateIdeas from './pages/dateIdeas'
 
 function App() {

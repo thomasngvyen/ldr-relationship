@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { client } from '../api/client'
+import ErrorBanner from '../components/ErrorBanner'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { MOODS, formatMoodLabel } from '../constants/moods'
 import './Dashboard.css'
 import './ManageMessages.css'
@@ -21,17 +23,17 @@ export default function ManageMessages() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [deletingId, setDeletingId] = useState(/** @type {string | null} */ (null))
-  const [error, setError] = useState(/** @type {string | null} */ (null))
+  const [error, setError] = useState('')
 
   useEffect(() => {
     let cancelled = false
 
     async function fetchMoodMessages() {
       setLoading(true)
-      setError(null)
+      setError('')
 
       try {
-        const data = await client('/api/moodMessages')  
+        const data = await client('/api/moodMessages')
         if (!cancelled) {
           setMessages(Array.isArray(data.moodMessages) ? data.moodMessages : [])
         }
@@ -66,7 +68,7 @@ export default function ManageMessages() {
   function startEdit(item) {
     setEditingMessageId(item.id)
     setFormData({ mood: item.mood, message: item.message })
-    setError(null)
+    setError('')
   }
 
   function cancelEdit() {
@@ -74,12 +76,16 @@ export default function ManageMessages() {
     setFormData({ mood: '', message: '' })
   }
 
+  function dismissError() {
+    setError('')
+  }
+
   /**
    * @param {React.FormEvent<HTMLFormElement>} e
    */
   async function handleSubmit(e) {
     e.preventDefault()
-    setError(null)
+    setError('')
     setSubmitting(true)
 
     try {
@@ -112,7 +118,7 @@ export default function ManageMessages() {
    */
   async function handleDelete(id) {
     setDeletingId(id)
-    setError(null)
+    setError('')
 
     try {
       await client(`/api/moodMessages/${id}`, { method: 'DELETE' })
@@ -139,7 +145,7 @@ export default function ManageMessages() {
         </p>
 
         <div className="dashboard-page__stack">
-          {error ? <p className="dashboard-page__error">{error}</p> : null}
+          <ErrorBanner message={error} onDismiss={dismissError} />
 
           <form className="manage-form" onSubmit={handleSubmit}>
             <span className="manage-form__badge">Library</span>
@@ -208,11 +214,9 @@ export default function ManageMessages() {
           <div>
             <p className="dashboard-page__label">Your messages</p>
             {loading ? (
-              <p className="dashboard-page__text" style={{ margin: 0 }}>
-                Loading your library...
-              </p>
+              <LoadingSpinner label="Loading your library..." />
             ) : messages.length === 0 ? (
-              <p className="dashboard-page__text" style={{ margin: 0 }}>
+              <p className="dashboard-page__text">
                 No messages yet. Add one above to get started.
               </p>
             ) : (
@@ -245,7 +249,7 @@ export default function ManageMessages() {
             )}
           </div>
 
-          <p className="dashboard-page__text" style={{ margin: 0, textAlign: 'center' }}>
+          <p className="dashboard-page__text">
             <Link to="/moods" className="dashboard-page__link">
               Back to moods
             </Link>

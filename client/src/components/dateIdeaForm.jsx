@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { DATE_IDEA_CATEGORIES, formatCategoryLabel } from '../constants/dateIdeas'
+import ErrorBanner from './ErrorBanner'
 import './DateIdeaComponents.css'
 
 /**
@@ -57,7 +58,7 @@ export default function DateIdeaForm({
         </p>
       </div>
 
-      {error ? <p className="idea-form__error">{error}</p> : null}
+      {error ? <ErrorBanner message={error} onDismiss={() => setError('')} /> : null}
 
       <div className="idea-form__field">
         <label htmlFor="idea-title">Title</label>

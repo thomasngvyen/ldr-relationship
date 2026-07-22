@@ -1,0 +1,52 @@
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  background: rgba(190, 24, 93, 0.08);
+  border: 1px solid rgba(190, 24, 93, 0.18);
+  color: #9d174d;
+  animation: error-banner-in 0.35s ease both;
+}
+
+.error-banner__text {
+  flex: 1;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.error-banner__dismiss {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin: -0.15rem -0.2rem 0 0;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #be185d;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.error-banner__dismiss:hover {
+  background: rgba(190, 24, 93, 0.12);
+}
+
+@keyframes error-banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { client } from '../api/client'
+import ErrorBanner from '../components/ErrorBanner'
+import LoadingSpinner from '../components/LoadingSpinner'
 import MoodMessageModal from '../components/MoodMessageModal'
 import { MOOD_META, MOODS, formatMoodLabel } from '../constants/moods'
 import './Dashboard.css'
@@ -102,7 +104,7 @@ export default function Moods() {
         </p>
 
         {loading ? (
-          <p className="dashboard-page__text">Loading moods...</p>
+          <LoadingSpinner label="Loading moods..." />
         ) : !paired ? (
           <p className="dashboard-page__text">
             You need to be paired first.{' '}
@@ -113,7 +115,7 @@ export default function Moods() {
           </p>
         ) : (
           <div className="dashboard-page__stack">
-            {pageError ? <p className="dashboard-page__error">{pageError}</p> : null}
+            <ErrorBanner message={pageError} onDismiss={() => setPageError('')} />
 
             <div className="mood-grid" role="list">
               {moods.map((mood) => {

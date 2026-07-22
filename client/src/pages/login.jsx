@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthShell from '../components/AuthShell'
+import ErrorBanner from '../components/ErrorBanner'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
@@ -39,7 +40,7 @@ export default function Login() {
       footerLabel="Create one"
     >
       <form className="auth-form" onSubmit={handleSubmit}>
-        {error ? <p className="auth-error">{error}</p> : null}
+        <ErrorBanner message={error} onDismiss={() => setError('')} />
 
         <div className="auth-field">
           <label htmlFor="email">Email</label>

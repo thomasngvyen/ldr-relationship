@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { client } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import CountdownTimer from '../components/CountdownTimer'
+import ErrorBanner from '../components/ErrorBanner'
+import LoadingSpinner from '../components/LoadingSpinner'
 import VisitCard from '../components/VisitCard'
 import VisitForm from '../components/VisitForm'
 import './Dashboard.css'
@@ -147,7 +149,7 @@ export default function Dashboard() {
         </h1>
 
         {loading ? (
-          <p className="dashboard-page__text">Loading your space...</p>
+          <LoadingSpinner label="Loading your space..." />
         ) : !status?.paired ? (
           <p className="dashboard-page__text">
             You are not paired yet.{' '}
@@ -163,7 +165,7 @@ export default function Dashboard() {
               <span className="dashboard-page__accent">{status.partner?.displayName}</span>.
             </p>
 
-            {visitsError ? <p className="dashboard-page__error">{visitsError}</p> : null}
+            <ErrorBanner message={visitsError} onDismiss={() => setVisitsError('')} />
 
             {nextVisit ? (
               <div className="dashboard-page__stack">

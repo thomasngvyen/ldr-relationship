@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AuthShell from '../components/AuthShell'
+import ErrorBanner from '../components/ErrorBanner'
+import LoadingSpinner from '../components/LoadingSpinner'
 import { client } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 
@@ -157,10 +159,10 @@ export default function Pair() {
       footerLabel="dashboard"
     >
       {loading ? (
-        <p className="auth-muted">Loading your pairing status…</p>
+        <LoadingSpinner label="Loading your pairing status..." />
       ) : status?.paired ? (
         <div className="auth-pair-success">
-          {error ? <p className="auth-error">{error}</p> : null}
+          <ErrorBanner message={error} onDismiss={() => setError('')} />
           <div className="auth-pair-avatar" aria-hidden="true">
             {partnerName?.charAt(0)?.toUpperCase() ?? '♥'}
           </div>
@@ -207,7 +209,7 @@ export default function Pair() {
         </div>
       ) : waitingCode ? (
         <div className="auth-pair-waiting">
-          {error ? <p className="auth-error">{error}</p> : null}
+          <ErrorBanner message={error} onDismiss={() => setError('')} />
           <p className="auth-muted">Waiting for your partner to join…</p>
           <div className="auth-invite-code" aria-label="Invite code">
             {waitingCode}
@@ -242,7 +244,7 @@ export default function Pair() {
         </div>
       ) : (
         <div className="auth-pair-actions">
-          {error ? <p className="auth-error">{error}</p> : null}
+          <ErrorBanner message={error} onDismiss={() => setError('')} />
 
           <div className="auth-mode-toggle" role="tablist" aria-label="Pairing mode">
             <button

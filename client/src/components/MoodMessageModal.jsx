@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
 import { formatMoodLabel } from '../constants/moods'
+import ErrorBanner from './ErrorBanner'
+import LoadingSpinner from './LoadingSpinner'
 import './MoodMessageModal.css'
 
 /**
@@ -68,9 +70,9 @@ export default function MoodMessageModal({
         </h2>
 
         {loading ? (
-          <p className="mood-modal__body mood-modal__body--muted">One moment...</p>
+          <LoadingSpinner label="One moment..." size={56} />
         ) : error ? (
-          <p className="mood-modal__error">{error}</p>
+          <ErrorBanner message={error} />
         ) : (
           <p className="mood-modal__body">{message}</p>
         )}

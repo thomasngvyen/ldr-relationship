@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ErrorBanner from './ErrorBanner'
 import './VisitComponents.css'
 
 /**
@@ -68,7 +69,7 @@ export default function VisitForm({
         </p>
       </div>
 
-      {error ? <p className="visit-form__error">{error}</p> : null}
+      {error ? <ErrorBanner message={error} onDismiss={() => setError('')} /> : null}
 
       <div className="visit-form__fields">
         <div className="visit-form__field">

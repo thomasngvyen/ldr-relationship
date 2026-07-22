@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { client } from '../api/client'
+import ErrorBanner from '../components/ErrorBanner'
+import LoadingSpinner from '../components/LoadingSpinner'
 import VisitCard from '../components/VisitCard'
 import VisitForm from '../components/VisitForm'
 import './Dashboard.css'
@@ -174,7 +176,7 @@ export default function Visits() {
         </p>
 
         {loading ? (
-          <p className="dashboard-page__text">Loading your visits...</p>
+          <LoadingSpinner label="Loading your visits..." />
         ) : !paired ? (
           <p className="dashboard-page__text">
             You need to be paired first.{' '}
@@ -185,7 +187,7 @@ export default function Visits() {
           </p>
         ) : (
           <div className="dashboard-page__stack">
-            {error ? <p className="dashboard-page__error">{error}</p> : null}
+            <ErrorBanner message={error} onDismiss={() => setError('')} />
 
             {showForm ? (
               <VisitForm
