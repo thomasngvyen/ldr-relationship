@@ -211,7 +211,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 500;
-  color: var(--sm-accent, #ff0000);
+  color: var(--sm-accent, #ec4899);
 }
 
 .sm-socials-list {
@@ -238,7 +238,7 @@
 }
 
 .sm-socials-link:focus-visible {
-  outline: 2px solid var(--sm-accent, #ff0000);
+  outline: 2px solid var(--sm-accent, #ec4899);
   outline-offset: 3px;
 }
 
@@ -264,7 +264,7 @@
 }
 
 .sm-socials-link:hover {
-  color: var(--sm-accent, #ff0000);
+  color: var(--sm-accent, #ec4899);
 }
 
 .sm-panel-title {
@@ -331,7 +331,7 @@
 }
 
 .sm-panel-item:hover {
-  color: var(--sm-accent, #5227ff);
+  color: var(--sm-accent, #ec4899);
 }
 
 .sm-panel-list[data-numbering] {
@@ -346,7 +346,7 @@
   right: 2.8em;
   font-size: 18px;
   font-weight: 400;
-  color: var(--sm-accent, #5227ff);
+  color: var(--sm-accent, #ec4899);
   letter-spacing: 0;
   pointer-events: none;
   user-select: none;

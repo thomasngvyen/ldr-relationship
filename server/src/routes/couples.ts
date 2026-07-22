@@ -141,4 +141,26 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
+// Either partner can unpair; cancels a pending invite the same way
+router.delete('/me', authMiddleware, async (req, res) => {
+  try {
+    const userID = req.user!.userID;
+    const couple = await getCoupleForUser(userID);
+
+    if (!couple) {
+      return res.status(404).json({ error: 'You are not in a couple' });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.dateIdea.deleteMany({ where: { coupleId: couple.id } });
+      await tx.visit.deleteMany({ where: { coupleId: couple.id } });
+      await tx.couple.delete({ where: { id: couple.id } });
+    });
+
+    return res.status(200).json({ unpaired: true });
+  } catch {
+    return res.status(500).json({ error: 'Failed to unpair' });
+  }
+});
+
 export default router;

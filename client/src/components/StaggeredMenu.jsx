@@ -5,7 +5,7 @@ import './StaggeredMenu.css'
 
 export default function StaggeredMenu({
   position = 'right',
-  colors = ['#B497CF', '#5227FF'],
+  colors = ['#f9a8d4', '#f472b6'],
   items = /** @type {Array<{ label: string, link?: string, ariaLabel: string, onClick?: () => void }>} */ ([]),
   socialItems = /** @type {Array<{ label: string, link: string }>} */ ([]),
   displaySocials = true,
@@ -15,7 +15,7 @@ export default function StaggeredMenu({
   menuButtonColor = '#fff',
   openMenuButtonColor = '#fff',
   changeMenuColorOnOpen = true,
-  accentColor = '#5227FF',
+  accentColor = '#ec4899',
   isFixed = false,
   closeOnClickAway = true,
   onMenuOpen = /** @type {() => void} */ (() => {}),

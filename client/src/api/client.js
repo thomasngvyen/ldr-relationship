@@ -4,7 +4,7 @@ export const client = async (endpoint, { body, ...customConfig } = {}) => {
     const token = localStorage.getItem('token');
     const headers = {
         'Content-Type': 'application/json',
-    }
+    };
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
@@ -12,14 +12,17 @@ export const client = async (endpoint, { body, ...customConfig } = {}) => {
         method: body ? 'POST' : 'GET',
         ...customConfig,
         headers,
-    }
+    };
     if (body) {
         config.body = JSON.stringify(body);
     }
-    try{
+    try {
         const response = await fetch(`${BASE_URL}${endpoint}`, config);
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
+            if (response.status === 401 && !endpoint.startsWith('/api/auth/')) {
+                window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+            }
             throw new Error(data.error ?? 'Request failed');
         }
         return data;

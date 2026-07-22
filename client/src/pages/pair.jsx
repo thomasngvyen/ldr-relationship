@@ -20,6 +20,7 @@ export default function Pair() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [confirmUnpair, setConfirmUnpair] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -120,6 +121,24 @@ export default function Pair() {
     }
   }
 
+  async function handleUnpair() {
+    setError('')
+    setSubmitting(true)
+
+    try {
+      await client('/api/couples/me', { method: 'DELETE' })
+      setStatus({ paired: false, couple: null, partner: null })
+      setConfirmUnpair(false)
+      setMode('create')
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Could not unpair right now.'
+      setError(message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   const waitingCode = status?.couple?.inviteCode
   const partnerName = status?.partner?.displayName
 
@@ -141,6 +160,7 @@ export default function Pair() {
         <p className="auth-muted">Loading your pairing status…</p>
       ) : status?.paired ? (
         <div className="auth-pair-success">
+          {error ? <p className="auth-error">{error}</p> : null}
           <div className="auth-pair-avatar" aria-hidden="true">
             {partnerName?.charAt(0)?.toUpperCase() ?? '♥'}
           </div>
@@ -149,6 +169,41 @@ export default function Pair() {
           <Link to="/dashboard" className="auth-submit-btn auth-submit-btn--link">
             Open dashboard
           </Link>
+
+          {confirmUnpair ? (
+            <div className="auth-unpair-confirm">
+              <p className="auth-muted">
+                This unlinks your accounts and removes shared visits and date ideas.
+                Your personal mood messages stay with you.
+              </p>
+              <div className="auth-unpair-actions">
+                <button
+                  type="button"
+                  className="auth-secondary-btn"
+                  onClick={() => setConfirmUnpair(false)}
+                  disabled={submitting}
+                >
+                  Keep paired
+                </button>
+                <button
+                  type="button"
+                  className="auth-danger-btn"
+                  onClick={handleUnpair}
+                  disabled={submitting}
+                >
+                  {submitting ? 'Unpairing…' : 'Yes, unpair'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="auth-danger-btn auth-danger-btn--ghost"
+              onClick={() => setConfirmUnpair(true)}
+            >
+              Unpair from {partnerName ?? 'partner'}
+            </button>
+          )}
         </div>
       ) : waitingCode ? (
         <div className="auth-pair-waiting">
@@ -163,6 +218,14 @@ export default function Pair() {
             onClick={() => handleCopy(waitingCode)}
           >
             {copied ? 'Copied!' : 'Copy invite code'}
+          </button>
+          <button
+            type="button"
+            className="auth-danger-btn auth-danger-btn--ghost"
+            onClick={handleUnpair}
+            disabled={submitting}
+          >
+            {submitting ? 'Canceling…' : 'Cancel invite'}
           </button>
           <p className="auth-muted auth-muted--small">
             Already have a code from them instead?{' '}

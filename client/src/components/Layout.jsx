@@ -46,8 +46,8 @@ export default function Layout({ children }) {
         menuButtonColor="#fff"
         openMenuButtonColor="#fff"
         changeMenuColorOnOpen
-        colors={['#E8B4F8', '#aa3bff']}
-        accentColor="#aa3bff"
+        colors={['#f9a8d4', '#f472b6']}
+        accentColor="#ec4899"
       />
       <main className="relative z-0 px-6 pb-12 pt-24">{children}</main>
     </div>
