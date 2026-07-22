@@ -31,7 +31,7 @@ export default function ManageMessages() {
       setError(null)
 
       try {
-        const data = await client('/api/moodMessages')
+        const data = await client('/api/moodMessages')  
         if (!cancelled) {
           setMessages(Array.isArray(data.moodMessages) ? data.moodMessages : [])
         }
