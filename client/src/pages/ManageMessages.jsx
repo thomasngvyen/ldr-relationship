@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { client } from '../api/client'
+import DashboardOrbs from '../components/DashboardOrbs'
 import ErrorBanner from '../components/ErrorBanner'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { MOODS, formatMoodLabel } from '../constants/moods'
@@ -135,8 +136,7 @@ export default function ManageMessages() {
 
   return (
     <div className="dashboard-page">
-      <div className="dashboard-page__orb dashboard-page__orb--one" aria-hidden="true" />
-      <div className="dashboard-page__orb dashboard-page__orb--two" aria-hidden="true" />
+      <DashboardOrbs />
 
       <section className="dashboard-page__content">
         <h1 className="dashboard-page__title">Manage messages</h1>

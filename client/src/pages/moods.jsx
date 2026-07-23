@@ -1,14 +1,18 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { client } from '../api/client'
+import DashboardOrbs from '../components/DashboardOrbs'
 import ErrorBanner from '../components/ErrorBanner'
 import LoadingSpinner from '../components/LoadingSpinner'
 import MoodMessageModal from '../components/MoodMessageModal'
+import { MQ } from '../constants/breakpoints'
 import { MOOD_META, MOODS, formatMoodLabel } from '../constants/moods'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import './Dashboard.css'
 import './Moods.css'
 
 export default function Moods() {
+  const isMobile = useMediaQuery(MQ.mobile)
   const [paired, setPaired] = useState(false)
   const [moods, setMoods] = useState(/** @type {string[]} */ ([]))
   const [loading, setLoading] = useState(true)
@@ -94,8 +98,7 @@ export default function Moods() {
 
   return (
     <div className="dashboard-page">
-      <div className="dashboard-page__orb dashboard-page__orb--one" aria-hidden="true" />
-      <div className="dashboard-page__orb dashboard-page__orb--two" aria-hidden="true" />
+      <DashboardOrbs />
 
       <section className="dashboard-page__content">
         <h1 className="dashboard-page__title">Moods</h1>
@@ -117,7 +120,10 @@ export default function Moods() {
           <div className="dashboard-page__stack">
             <ErrorBanner message={pageError} onDismiss={() => setPageError('')} />
 
-            <div className="mood-grid" role="list">
+            <div
+              className={isMobile ? 'mood-grid mood-grid--compact' : 'mood-grid'}
+              role="list"
+            >
               {moods.map((mood) => {
                 const meta = MOOD_META[mood] ?? {
                   label: formatMoodLabel(mood),
@@ -134,7 +140,9 @@ export default function Moods() {
                     disabled={delivering}
                   >
                     <span className="mood-grid__label">{meta.label}</span>
-                    <span className="mood-grid__blurb">{meta.blurb}</span>
+                    {!isMobile ? (
+                      <span className="mood-grid__blurb">{meta.blurb}</span>
+                    ) : null}
                   </button>
                 )
               })}

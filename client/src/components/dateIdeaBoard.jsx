@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { client } from '../api/client'
+import { MQ } from '../constants/breakpoints'
 import { STATUS_COLUMNS, statusToColumn } from '../constants/dateIdeas'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import DateIdeaCard from './dateIdeaCard'
 import DateIdeaForm from './dateIdeaForm'
 import ErrorBanner from './ErrorBanner'
@@ -10,6 +12,9 @@ import './DateIdeaComponents.css'
 /** @typedef {import('./dateIdeaCard').DateIdea} DateIdea */
 
 export default function DateIdeaBoard() {
+  const isTablet = useMediaQuery(MQ.tablet)
+  const [activeColumn, setActiveColumn] = useState(STATUS_COLUMNS[0].key)
+
   const [ideas, setIdeas] = useState(/** @type {DateIdea[]} */ ([]))
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(/** @type {string | null} */ (null))
@@ -71,6 +76,7 @@ export default function DateIdeaBoard() {
       } else {
         const data = await client('/api/dateIdeas', { body: values })
         setIdeas((prev) => [data.dateIdea, ...prev])
+        setActiveColumn('IDEA')
       }
 
       setShowForm(false)
@@ -119,6 +125,9 @@ export default function DateIdeaBoard() {
       setIdeas((prev) =>
         prev.map((item) => (item.id === idea.id ? data.dateIdea : item)),
       )
+      if (isTablet) {
+        setActiveColumn(statusToColumn(status))
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to move this idea')
     } finally {
@@ -160,9 +169,59 @@ export default function DateIdeaBoard() {
     setEditingIdea(null)
   }
 
+  /**
+   * @param {string} columnKey
+   */
+  function renderColumn(columnKey) {
+    const column = STATUS_COLUMNS.find((entry) => entry.key === columnKey)
+    if (!column) return null
+
+    const columnIdeas = ideas.filter(
+      (idea) => statusToColumn(idea.status) === column.key,
+    )
+
+    return (
+      <section key={column.key} className="idea-board__column">
+        {!isTablet ? (
+          <header className="idea-board__heading">
+            <p className="idea-board__label">
+              {column.label}
+              <span className="idea-board__count">{columnIdeas.length}</span>
+            </p>
+            <p className="idea-board__blurb">{column.blurb}</p>
+          </header>
+        ) : (
+          <p className="idea-board__blurb">{column.blurb}</p>
+        )}
+
+        {columnIdeas.length === 0 ? (
+          <p className="idea-board__empty">Nothing here yet</p>
+        ) : (
+          columnIdeas.map((idea) => (
+            <DateIdeaCard
+              key={idea.id}
+              idea={idea}
+              onVote={handleVote}
+              onEdit={startEdit}
+              onDelete={handleDelete}
+              onStatusChange={handleStatusChange}
+              voting={votingId === idea.id}
+              updating={updatingId === idea.id}
+              deleting={deletingId === idea.id}
+            />
+          ))
+        )}
+      </section>
+    )
+  }
+
   if (loading) {
     return <LoadingSpinner label="Loading your date ideas..." />
   }
+
+  const visibleColumns = isTablet
+    ? STATUS_COLUMNS.filter((column) => column.key === activeColumn)
+    : STATUS_COLUMNS
 
   return (
     <div className="dashboard-page__stack">
@@ -186,42 +245,33 @@ export default function DateIdeaBoard() {
         </button>
       )}
 
-      <div className="idea-board">
-        {STATUS_COLUMNS.map((column) => {
-          const columnIdeas = ideas.filter(
-            (idea) => statusToColumn(idea.status) === column.key,
-          )
+      {isTablet ? (
+        <div className="idea-board__tabs" role="tablist" aria-label="Date idea status">
+          {STATUS_COLUMNS.map((column) => {
+            const count = ideas.filter(
+              (idea) => statusToColumn(idea.status) === column.key,
+            ).length
+            const selected = activeColumn === column.key
 
-          return (
-            <section key={column.key} className="idea-board__column">
-              <header className="idea-board__heading">
-                <p className="idea-board__label">
-                  {column.label}
-                  <span className="idea-board__count">{columnIdeas.length}</span>
-                </p>
-                <p className="idea-board__blurb">{column.blurb}</p>
-              </header>
+            return (
+              <button
+                key={column.key}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                className={selected ? 'idea-board__tab is-active' : 'idea-board__tab'}
+                onClick={() => setActiveColumn(column.key)}
+              >
+                {column.label}
+                <span className="idea-board__count">{count}</span>
+              </button>
+            )
+          })}
+        </div>
+      ) : null}
 
-              {columnIdeas.length === 0 ? (
-                <p className="idea-board__empty">Nothing here yet</p>
-              ) : (
-                columnIdeas.map((idea) => (
-                  <DateIdeaCard
-                    key={idea.id}
-                    idea={idea}
-                    onVote={handleVote}
-                    onEdit={startEdit}
-                    onDelete={handleDelete}
-                    onStatusChange={handleStatusChange}
-                    voting={votingId === idea.id}
-                    updating={updatingId === idea.id}
-                    deleting={deletingId === idea.id}
-                  />
-                ))
-              )}
-            </section>
-          )
-        })}
+      <div className={isTablet ? 'idea-board idea-board--single' : 'idea-board'}>
+        {visibleColumns.map((column) => renderColumn(column.key))}
       </div>
     </div>
   )

@@ -416,3 +416,62 @@
     grid-template-columns: 1fr;
   }
 }
+
+.idea-board--single {
+  grid-template-columns: 1fr;
+}
+
+.idea-board__tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 0.35rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(10px);
+}
+
+.idea-board__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.7rem 0.5rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #9d174d;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.idea-board__tab.is-active {
+  background: linear-gradient(120deg, #f472b6, #fb7185);
+  color: white;
+  box-shadow: 0 8px 20px rgba(244, 114, 182, 0.3);
+}
+
+.idea-board__tab.is-active .idea-board__count {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+@media (max-width: 540px) {
+  .idea-board__tabs {
+    border-radius: 1.25rem;
+  }
+
+  .idea-board__tab {
+    font-size: 0.68rem;
+    padding: 0.65rem 0.35rem;
+  }
+}

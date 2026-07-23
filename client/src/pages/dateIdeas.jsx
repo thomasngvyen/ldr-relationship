@@ -1,11 +1,11 @@
 import DateIdeaBoard from '../components/dateIdeaBoard'
+import DashboardOrbs from '../components/DashboardOrbs'
 import './Dashboard.css'
 
 export default function DateIdeas() {
   return (
     <div className="dashboard-page">
-      <div className="dashboard-page__orb dashboard-page__orb--one" aria-hidden="true" />
-      <div className="dashboard-page__orb dashboard-page__orb--two" aria-hidden="true" />
+      <DashboardOrbs />
 
       <section className="dashboard-page__content dashboard-page__content--wide">
         <h1 className="dashboard-page__title">Date ideas</h1>

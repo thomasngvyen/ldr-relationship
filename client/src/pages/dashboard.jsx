@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import CountdownTimer from '../components/CountdownTimer'
 import ErrorBanner from '../components/ErrorBanner'
 import LoadingSpinner from '../components/LoadingSpinner'
+import DashboardOrbs from '../components/DashboardOrbs'
 import VisitCard from '../components/VisitCard'
 import VisitForm from '../components/VisitForm'
 import './Dashboard.css'
@@ -140,8 +141,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-page">
-      <div className="dashboard-page__orb dashboard-page__orb--one" aria-hidden="true" />
-      <div className="dashboard-page__orb dashboard-page__orb--two" aria-hidden="true" />
+      <DashboardOrbs />
 
       <section className="dashboard-page__content">
         <h1 className="dashboard-page__title">
