@@ -28,6 +28,11 @@ export const client = async (endpoint, { body, ...customConfig } = {}) => {
         return data;
     } catch (error) {
         console.error('Error:', error);
+        if (error instanceof TypeError) {
+            throw new Error(
+                'Cannot reach the server. Is it running on port 3001?',
+            );
+        }
         throw error;
     }
 };
