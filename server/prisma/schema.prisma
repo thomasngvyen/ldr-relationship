@@ -18,6 +18,7 @@ model User {
   moodMessages MoodMessage[] @relation("UserMoodMessages")
   dateIdeas DateIdea[] @relation("UserDateIdeas")
   dateIdeaVotes DateIdeaVote[] @relation("UserDateIdeaVotes")
+  visits Visit[] @relation("VisitingPartner")
   @@map("users")
 }
 
@@ -45,6 +46,8 @@ model Visit {
   coupleId   String   @map("couple_id")
   couple     Couple   @relation("CoupleVisits", fields: [coupleId], references: [id], map: "visits_couple_fkey")
   createdAt  DateTime @default(now()) @map("created_at")
+  visitingPartnerId String? @map("visiting_partner_id")
+  visitingPartner User? @relation("VisitingPartner", fields: [visitingPartnerId], references: [id], map: "visits_visiting_partner_fkey")
 
   @@map("visits")
 }
