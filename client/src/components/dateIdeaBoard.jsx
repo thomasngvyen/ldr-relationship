@@ -231,6 +231,10 @@ export default function DateIdeaBoard() {
     return <LoadingSpinner label="Loading your date ideas..." />
   }
 
+  if (error && !paired) {
+    return <ErrorBanner message={error} onDismiss={() => setError(null)} />
+  }
+
   if (!paired) {
     return (
       <p className="dashboard-page__text">

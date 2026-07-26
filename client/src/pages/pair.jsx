@@ -132,14 +132,47 @@ export default function Pair() {
       setStatus({ paired: false, couple: null, partner: null })
       setConfirmUnpair(false)
       setMode('create')
+      return true
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Could not unpair right now.'
       setError(message)
+      return false
     } finally {
       setSubmitting(false)
     }
   }
+
+  useEffect(() => {
+    if (loading || status?.paired || !status?.couple?.inviteCode) return
+
+    let cancelled = false
+
+    async function refreshStatus() {
+      try {
+        const data = await client('/api/couples/me')
+        if (!cancelled) {
+          setStatus(data)
+        }
+      } catch {
+        // Keep showing the invite while waiting; transient errors are fine.
+      }
+    }
+
+    const intervalId = window.setInterval(refreshStatus, 3000)
+
+    function onFocus() {
+      refreshStatus()
+    }
+
+    window.addEventListener('focus', onFocus)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(intervalId)
+      window.removeEventListener('focus', onFocus)
+    }
+  }, [loading, status?.paired, status?.couple?.inviteCode])
 
   const waitingCode = status?.couple?.inviteCode
   const partnerName = status?.partner?.displayName
@@ -175,8 +208,8 @@ export default function Pair() {
           {confirmUnpair ? (
             <div className="auth-unpair-confirm">
               <p className="auth-muted">
-                This unlinks your accounts and removes shared visits and date ideas.
-                Your personal mood messages stay with you.
+                This unlinks your accounts and removes shared visits, date ideas,
+                and mood messages for this pair.
               </p>
               <div className="auth-unpair-actions">
                 <button
@@ -235,8 +268,10 @@ export default function Pair() {
               type="button"
               className="auth-inline-btn"
               onClick={async () => {
-                await handleUnpair()
-                setMode('join')
+                const cleared = await handleUnpair()
+                if (cleared) {
+                  setMode('join')
+                }
               }}
               disabled={submitting}
             >

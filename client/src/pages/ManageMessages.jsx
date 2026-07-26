@@ -16,6 +16,7 @@ import './ManageMessages.css'
  */
 
 export default function ManageMessages() {
+  const [paired, setPaired] = useState(false)
   const [messages, setMessages] = useState(/** @type {MoodMessage[]} */ ([]))
   const [formData, setFormData] = useState({ mood: '', message: '' })
   const [editingMessageId, setEditingMessageId] = useState(
@@ -29,11 +30,21 @@ export default function ManageMessages() {
   useEffect(() => {
     let cancelled = false
 
-    async function fetchMoodMessages() {
+    async function loadPage() {
       setLoading(true)
       setError('')
 
       try {
+        const coupleData = await client('/api/couples/me')
+        if (cancelled) return
+
+        setPaired(Boolean(coupleData.paired))
+
+        if (!coupleData.paired) {
+          setMessages([])
+          return
+        }
+
         const data = await client('/api/moodMessages')
         if (!cancelled) {
           setMessages(Array.isArray(data.moodMessages) ? data.moodMessages : [])
@@ -49,7 +60,7 @@ export default function ManageMessages() {
       }
     }
 
-    fetchMoodMessages()
+    loadPage()
 
     return () => {
       cancelled = true
@@ -144,6 +155,19 @@ export default function ManageMessages() {
           Write short notes for each mood. Your partner will see one when they tap how they feel.
         </p>
 
+        {loading ? (
+          <LoadingSpinner label="Loading your library..." />
+        ) : error && !paired ? (
+          <ErrorBanner message={error} onDismiss={dismissError} />
+        ) : !paired ? (
+          <p className="dashboard-page__text">
+            You need to be paired first.{' '}
+            <Link to="/pair" className="dashboard-page__link">
+              Connect with your partner
+            </Link>{' '}
+            to manage mood messages.
+          </p>
+        ) : (
         <div className="dashboard-page__stack">
           <ErrorBanner message={error} onDismiss={dismissError} />
 
@@ -213,9 +237,7 @@ export default function ManageMessages() {
 
           <div>
             <p className="dashboard-page__label">Your messages</p>
-            {loading ? (
-              <LoadingSpinner label="Loading your library..." />
-            ) : messages.length === 0 ? (
+            {messages.length === 0 ? (
               <p className="dashboard-page__text">
                 No messages yet. Add one above to get started.
               </p>
@@ -255,6 +277,7 @@ export default function ManageMessages() {
             </Link>
           </p>
         </div>
+        )}
       </section>
     </div>
   )

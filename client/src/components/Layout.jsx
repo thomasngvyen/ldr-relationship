@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import StaggeredMenu from './StaggeredMenu'
 import { useAuth } from '../context/AuthContext'
 import { MQ } from '../constants/breakpoints'
@@ -9,6 +9,9 @@ const publicMenuItems = [
   { label: 'Register', ariaLabel: 'Create an account', link: '/register' },
 ]
 
+/** Auth-style pages sit on the dark layout chrome around the card. */
+const DARK_CHROME_ROUTES = new Set(['/login', '/register', '/pair'])
+
 /**
  * @param {Object} props
  * @param {React.ReactNode} props.children
@@ -17,8 +20,10 @@ const publicMenuItems = [
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const isMobile = useMediaQuery(MQ.mobile)
   const isCompactMenu = useMediaQuery(MQ.menuCollapse)
+  const isDarkChrome = DARK_CHROME_ROUTES.has(pathname)
 
   const authedMenuItems = [
     { label: 'Dashboard', ariaLabel: 'Go to dashboard', link: '/dashboard' },
@@ -50,9 +55,10 @@ export default function Layout({ children }) {
         position="right"
         items={menuItems}
         logoLink={user ? '/dashboard' : '/login'}
+        logoTextColor={isDarkChrome ? '#ffffff' : '#831843'}
         displaySocials={false}
         displayItemNumbering={!isCompactMenu}
-        menuButtonColor="#831843"
+        menuButtonColor={isDarkChrome ? '#ffffff' : '#831843'}
         openMenuButtonColor="#831843"
         changeMenuColorOnOpen
         colors={['#f9a8d4', '#f472b6']}

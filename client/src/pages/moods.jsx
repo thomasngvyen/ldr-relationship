@@ -119,6 +119,8 @@ export default function Moods() {
 
         {loading ? (
           <LoadingSpinner label="Loading moods..." />
+        ) : pageError ? (
+          <ErrorBanner message={pageError} onDismiss={() => setPageError('')} />
         ) : !paired ? (
           <p className="dashboard-page__text">
             You need to be paired first.{' '}
@@ -129,8 +131,6 @@ export default function Moods() {
           </p>
         ) : (
           <div className="dashboard-page__stack">
-            <ErrorBanner message={pageError} onDismiss={() => setPageError('')} />
-
             <div
               className={isMobile ? 'mood-grid mood-grid--compact' : 'mood-grid'}
               role="list"

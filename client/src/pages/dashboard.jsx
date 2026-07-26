@@ -157,6 +157,8 @@ export default function Dashboard() {
 
         {loading ? (
           <LoadingSpinner label="Loading your space..." />
+        ) : !status && visitsError ? (
+          <ErrorBanner message={visitsError} onDismiss={() => setVisitsError('')} />
         ) : !status?.paired ? (
           <p className="dashboard-page__text">
             You are not paired yet.{' '}

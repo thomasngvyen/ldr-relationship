@@ -13,6 +13,7 @@ export default function StaggeredMenu({
   className = '',
   logoUrl = '/heartsync-logo.png',
   logoLink = '/dashboard',
+  logoTextColor = '#831843',
   menuButtonColor = '#fff',
   openMenuButtonColor = '#fff',
   changeMenuColorOnOpen = true,
@@ -416,9 +417,10 @@ export default function StaggeredMenu({
     <div
       className={`${className ? `${className} ` : ''}staggered-menu-wrapper${isFixed ? ' fixed-wrapper' : ''}`}
       style={
-        accentColor
-          ? /** @type {React.CSSProperties} */ ({ '--sm-accent': accentColor })
-          : undefined
+        /** @type {React.CSSProperties} */ ({
+          ...(accentColor ? { '--sm-accent': accentColor } : {}),
+          '--sm-logo-color': logoTextColor,
+        })
       }
       data-position={position}
       data-open={open || undefined}

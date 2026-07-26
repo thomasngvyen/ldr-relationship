@@ -170,6 +170,8 @@ export default function Visits() {
 
         {loading ? (
           <LoadingSpinner label="Loading your visits..." />
+        ) : error && !paired ? (
+          <ErrorBanner message={error} onDismiss={() => setError('')} />
         ) : !paired ? (
           <p className="dashboard-page__text">
             You need to be paired first.{' '}
