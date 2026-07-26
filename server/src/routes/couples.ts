@@ -183,6 +183,10 @@ router.delete('/me', authMiddleware, async (req, res) => {
     }
 
     await prisma.$transaction(async (tx) => {
+      await tx.memoryImage.deleteMany({
+        where: { memory: { coupleId: couple.id } },
+      });
+      await tx.memory.deleteMany({ where: { coupleId: couple.id } });
       await tx.moodMessage.deleteMany({ where: { coupleId: couple.id } });
       await tx.dateIdea.deleteMany({ where: { coupleId: couple.id } });
       await tx.visit.deleteMany({ where: { coupleId: couple.id } });

@@ -9,6 +9,7 @@ import Visits from './pages/visits'
 import Moods from './pages/moods'
 import ManageMessages from './pages/ManageMessages'
 import DateIdeas from './pages/dateIdeas'
+import Memories from './pages/memories'
 
 function App() {
   return (
@@ -62,6 +63,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DateIdeas />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/memories"
+          element={
+            <ProtectedRoute>
+              <Memories />
             </ProtectedRoute>
           }
         />

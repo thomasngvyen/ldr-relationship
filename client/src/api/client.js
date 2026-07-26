@@ -2,19 +2,25 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
 export const client = async (endpoint, { body, ...customConfig } = {}) => {
     const token = localStorage.getItem('token');
-    const headers = {
-        'Content-Type': 'application/json',
-    };
+    const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+    /** @type {Record<string, string>} */
+    const headers = {};
+    if (!isFormData) {
+        headers['Content-Type'] = 'application/json';
+    }
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
     const config = {
         method: body ? 'POST' : 'GET',
         ...customConfig,
-        headers,
+        headers: {
+            ...headers,
+            ...(customConfig.headers ?? {}),
+        },
     };
     if (body) {
-        config.body = JSON.stringify(body);
+        config.body = isFormData ? body : JSON.stringify(body);
     }
     try {
         const response = await fetch(`${BASE_URL}${endpoint}`, config);
@@ -37,6 +43,16 @@ export const client = async (endpoint, { body, ...customConfig } = {}) => {
         throw error;
     }
 };
+
+/**
+ * Resolve an uploaded media path for <img src>.
+ * @param {string | null | undefined} url
+ */
+export function mediaUrl(url) {
+    if (!url) return '';
+    if (/^https?:\/\//i.test(url)) return url;
+    return `${BASE_URL}${url}`;
+}
 
 /**
  * @param {unknown} errors

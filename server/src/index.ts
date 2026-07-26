@@ -12,7 +12,9 @@ import moodsRouter from './routes/moods';
 import { authMiddleware } from './middleware/auth';
 import { requireCouple } from './middleware/requireCouple';
 import dateIdeasRouter from './routes/dateIdeas';
+import memoriesRouter from './routes/memories';
 import rateLimit from './middleware/rateLimit';
+import { MEMORY_UPLOAD_DIR } from './lib/memoryUploads';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -22,6 +24,7 @@ app.set('trust proxy', 1);
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads/memories', express.static(MEMORY_UPLOAD_DIR));
 
 app.use('/api', rateLimit(120, 60_000));
 
@@ -33,6 +36,7 @@ app.use('/api/visits', authMiddleware, requireCouple, visitsRouter);
 app.use('/api/moods', authMiddleware, requireCouple, moodsRouter);
 app.use('/api/moodMessages', authMiddleware, requireCouple, moodMessagesRouter);
 app.use('/api/dateIdeas', authMiddleware, requireCouple, dateIdeasRouter);
+app.use('/api/memories', authMiddleware, requireCouple, memoriesRouter);
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });

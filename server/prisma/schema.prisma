@@ -19,6 +19,7 @@ model User {
   dateIdeas DateIdea[] @relation("UserDateIdeas")
   dateIdeaVotes DateIdeaVote[] @relation("UserDateIdeaVotes")
   visits Visit[] @relation("VisitingPartner")
+  memoryImages MemoryImage[] @relation("UserMemoryImages")
   @@map("users")
 }
 
@@ -35,6 +36,7 @@ model Couple {
   visits       Visit[]        @relation("CoupleVisits")
   dateIdeas    DateIdea[]     @relation("CoupleDateIdeas")
   moodMessages MoodMessage[]  @relation("CoupleMoodMessages")
+  memories     Memory[]       @relation("CoupleMemories")
 
   @@map("couples")
 }
@@ -48,6 +50,7 @@ model Visit {
   createdAt  DateTime @default(now()) @map("created_at")
   visitingPartnerId String? @map("visiting_partner_id")
   visitingPartner User? @relation("VisitingPartner", fields: [visitingPartnerId], references: [id], map: "visits_visiting_partner_fkey")
+  memory Memory? @relation("VisitMemory")
 
   @@map("visits")
 }
@@ -94,6 +97,7 @@ model DateIdea {
   couple Couple         @relation("CoupleDateIdeas", fields: [coupleId], references: [id], map: "date_ideas_couple_fkey")
   user   User           @relation("UserDateIdeas", fields: [userId], references: [id], map: "date_ideas_user_fkey")
   votes  DateIdeaVote[] @relation("DateIdeaVotes")
+  memory Memory?        @relation("DateIdeaMemory")
 
   @@map("date_ideas")
 }
@@ -126,4 +130,38 @@ model DateIdeaVote {
 
   @@unique([dateIdeaId, userId])
   @@map("date_idea_votes")
+}
+
+model Memory {
+  id         String   @id @default(cuid())
+  coupleId   String   @map("couple_id")
+  visitId    String?  @unique @map("visit_id")
+  dateIdeaId String?  @unique @map("date_idea_id")
+  title      String?
+  note       String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  couple   Couple         @relation("CoupleMemories", fields: [coupleId], references: [id], map: "memories_couple_fkey", onDelete: Cascade)
+  visit    Visit?         @relation("VisitMemory", fields: [visitId], references: [id], map: "memories_visit_fkey", onDelete: Cascade)
+  dateIdea DateIdea?      @relation("DateIdeaMemory", fields: [dateIdeaId], references: [id], map: "memories_date_idea_fkey", onDelete: Cascade)
+  images   MemoryImage[]
+
+  @@map("memories")
+}
+
+model MemoryImage {
+  id           String   @id @default(cuid())
+  memoryId     String   @map("memory_id")
+  filename     String
+  originalName String?  @map("original_name")
+  mimeType     String?  @map("mime_type")
+  caption      String?
+  uploadedById String   @map("uploaded_by_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  memory     Memory @relation(fields: [memoryId], references: [id], map: "memory_images_memory_fkey", onDelete: Cascade)
+  uploadedBy User   @relation("UserMemoryImages", fields: [uploadedById], references: [id], map: "memory_images_user_fkey")
+
+  @@map("memory_images")
 }

@@ -59,7 +59,7 @@ export default function DateIdeaCard({
       <p className="idea-card__description">{idea.description}</p>
 
       {idea.user?.displayName ? (
-        <p className="idea-card__meta">Added by {idea.user.displayName}</p>
+        <p className="idea-card__meta">Added by <strong>{idea.user.displayName}</strong></p>
       ) : null}
 
       {(onStatusChange || onEdit || onDelete) && (

@@ -8,12 +8,14 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': 'http://localhost:3001',
+      '/uploads': 'http://localhost:3001',
     },
   },
   // Same proxy for `npm run preview` (production build locally)
   preview: {
     proxy: {
       '/api': 'http://localhost:3001',
+      '/uploads': 'http://localhost:3001',
     },
   },
 })
