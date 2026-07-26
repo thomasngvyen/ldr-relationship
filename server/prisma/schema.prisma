@@ -31,8 +31,9 @@ model Couple {
   userA User  @relation("UserA", fields: [userAId], references: [id], map: "couples_user_a_fkey")
   userB User? @relation("UserB", fields: [userBId], references: [id], map: "couples_user_b_fkey")
 
-  visits Visit[] @relation("CoupleVisits")
-  dateIdeas DateIdea[] @relation("CoupleDateIdeas")
+  visits       Visit[]        @relation("CoupleVisits")
+  dateIdeas    DateIdea[]     @relation("CoupleDateIdeas")
+  moodMessages MoodMessage[]  @relation("CoupleMoodMessages")
 
   @@map("couples")
 }
@@ -64,12 +65,15 @@ enum Mood {
 }
 
 model MoodMessage {
-  id String @id @default(cuid())
-  mood Mood
-  message String
+  id        String   @id @default(cuid())
+  mood      Mood
+  message   String
   createdAt DateTime @default(now())
-  userId String @map("user_id")
-  user User @relation("UserMoodMessages", fields: [userId], references: [id])
+  userId    String   @map("user_id")
+  coupleId  String   @map("couple_id")
+  user      User     @relation("UserMoodMessages", fields: [userId], references: [id])
+  couple    Couple   @relation("CoupleMoodMessages", fields: [coupleId], references: [id], map: "mood_messages_couple_fkey", onDelete: Cascade)
+
   @@map("mood_messages")
 }
 

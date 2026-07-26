@@ -95,14 +95,14 @@ export default function ManageMessages() {
           method: 'PATCH',
           body: formData,
         })
-        setMessages(
-          messages.map((item) =>
+        setMessages((prev) =>
+          prev.map((item) =>
             item.id === editingMessageId ? data.moodMessage : item,
           ),
         )
       } else {
         const data = await client('/api/moodMessages', { body: formData })
-        setMessages([data.moodMessage, ...messages])
+        setMessages((prev) => [data.moodMessage, ...prev])
       }
 
       setFormData({ mood: '', message: '' })
@@ -123,7 +123,7 @@ export default function ManageMessages() {
 
     try {
       await client(`/api/moodMessages/${id}`, { method: 'DELETE' })
-      setMessages(messages.filter((item) => item.id !== id))
+      setMessages((prev) => prev.filter((item) => item.id !== id))
       if (editingMessageId === id) {
         cancelEdit()
       }

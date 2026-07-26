@@ -95,21 +95,27 @@ const STARTER_MESSAGES: Record<Mood, string[]> = {
 
 /**
  * @param {string} userId
+ * @param {string} coupleId
  */
-function buildRowsForUser(userId: string) {
+function buildRowsForUser(userId: string, coupleId: string) {
   return (Object.entries(STARTER_MESSAGES) as [Mood, string[]][]).flatMap(
     ([mood, messages]) =>
       messages.map((message) => ({
         mood,
         message,
         userId,
+        coupleId,
       })),
   )
 }
 
-async function seedLibraryForUser(userId: string, label: string) {
-  await prisma.moodMessage.deleteMany({ where: { userId } })
-  const rows = buildRowsForUser(userId)
+async function seedLibraryForUser(
+  userId: string,
+  coupleId: string,
+  label: string,
+) {
+  await prisma.moodMessage.deleteMany({ where: { userId, coupleId } })
+  const rows = buildRowsForUser(userId, coupleId)
   await prisma.moodMessage.createMany({ data: rows })
   console.log(`  Seeded ${rows.length} messages for ${label} (${userId})`)
 }
@@ -139,7 +145,7 @@ async function main() {
     },
   })
 
-  await prisma.couple.upsert({
+  const couple = await prisma.couple.upsert({
     where: { userAId: author.id },
     update: { userBId: partner.id },
     create: {
@@ -149,26 +155,13 @@ async function main() {
     },
   })
 
-  // Seed every fully paired couple so real accounts get messages too
-  const pairedCouples = await prisma.couple.findMany({
-    where: { userBId: { not: null } },
-    include: {
-      userA: { select: { id: true, email: true } },
-    },
-  })
-
-  const seededAuthors = new Set<string>()
-
-  for (const couple of pairedCouples) {
-    if (seededAuthors.has(couple.userAId)) continue
-    seededAuthors.add(couple.userAId)
-    await seedLibraryForUser(couple.userAId, couple.userA.email)
-  }
+  // Seed both partners so either account gets messages when tapping moods
+  await seedLibraryForUser(author.id, couple.id, author.email)
+  await seedLibraryForUser(partner.id, couple.id, partner.email)
 
   console.log('Seed completed successfully')
   console.log(`  Test author:  ${AUTHOR_EMAIL} / ${SEED_PASSWORD}`)
   console.log(`  Test partner: ${PARTNER_EMAIL} / ${SEED_PASSWORD}`)
-  console.log(`  Couples seeded: ${seededAuthors.size}`)
 }
 
 main()

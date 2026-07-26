@@ -48,7 +48,21 @@ router.post('/invite', authMiddleware, async (req, res) => {
     return res.status(201).json({
       couple: { id: couple.id, inviteCode: couple.inviteCode },
     });
-  } catch {
+  } catch (error) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'P2002'
+    ) {
+      const existing = await getCoupleForUser(req.user!.userID);
+      if (existing && !existing.userBId) {
+        return res.status(200).json({
+          couple: { id: existing.id, inviteCode: existing.inviteCode },
+        });
+      }
+      return res.status(409).json({ error: 'Already paired' });
+    }
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -80,9 +94,18 @@ router.post('/pair', authMiddleware, zodValidator(pairSchema), async (req, res) 
       return res.status(409).json({ error: 'Invite code already used' });
     }
 
-    const updated = await prisma.couple.update({
-      where: { id: couple.id },
+    // Only claim the invite if it's still open (prevents two partners racing to join)
+    const claimed = await prisma.couple.updateMany({
+      where: { id: couple.id, userBId: null },
       data: { userBId: userID },
+    });
+
+    if (claimed.count === 0) {
+      return res.status(409).json({ error: 'Invite code already used' });
+    }
+
+    const updated = await prisma.couple.findUnique({
+      where: { id: couple.id },
       include: {
         userA: { select: partnerSelect },
         userB: { select: partnerSelect },
@@ -90,7 +113,15 @@ router.post('/pair', authMiddleware, zodValidator(pairSchema), async (req, res) 
     });
 
     return res.status(200).json({ paired: true, couple: updated });
-  } catch {
+  } catch (error) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'P2002'
+    ) {
+      return res.status(409).json({ error: 'Already in a couple' });
+    }
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -152,13 +183,22 @@ router.delete('/me', authMiddleware, async (req, res) => {
     }
 
     await prisma.$transaction(async (tx) => {
+      await tx.moodMessage.deleteMany({ where: { coupleId: couple.id } });
       await tx.dateIdea.deleteMany({ where: { coupleId: couple.id } });
       await tx.visit.deleteMany({ where: { coupleId: couple.id } });
       await tx.couple.delete({ where: { id: couple.id } });
     });
 
     return res.status(200).json({ unpaired: true });
-  } catch {
+  } catch (error) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'P2025'
+    ) {
+      return res.status(200).json({ unpaired: true });
+    }
     return res.status(500).json({ error: 'Failed to unpair' });
   }
 });

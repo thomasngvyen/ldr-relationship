@@ -49,6 +49,7 @@ export default function Layout({ children }) {
         isFixed
         position="right"
         items={menuItems}
+        logoLink={user ? '/dashboard' : '/login'}
         displaySocials={false}
         displayItemNumbering={!isCompactMenu}
         menuButtonColor="#831843"

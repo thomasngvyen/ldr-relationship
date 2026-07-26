@@ -6,13 +6,25 @@ import {
   moodMessageSchema,
   moodMessageUpdateSchema,
 } from '../schemas/moodMessages';
+import { getCoupleForUser } from './couples';
 
 const router = Router();
 
+async function getPairedCouple(userID: string) {
+  const couple = await getCoupleForUser(userID);
+  return couple?.userBId ? couple : null;
+}
+
 router.get('/', async (req, res) => {
   try {
+    const userID = req.user!.userID;
+    const couple = await getPairedCouple(userID);
+    if (!couple) {
+      return res.status(403).json({ error: 'User is not in a paired couple' });
+    }
+
     const moodMessages = await prisma.moodMessage.findMany({
-      where: { userId: req.user!.userID },
+      where: { userId: userID, coupleId: couple.id },
       orderBy: { createdAt: 'desc' },
     });
     return res.status(200).json({ moodMessages });
@@ -23,10 +35,17 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
+    const userID = req.user!.userID;
+    const couple = await getPairedCouple(userID);
+    if (!couple) {
+      return res.status(403).json({ error: 'User is not in a paired couple' });
+    }
+
     const moodMessage = await prisma.moodMessage.findFirst({
       where: {
         id: req.params.id as string,
-        userId: req.user!.userID,
+        userId: userID,
+        coupleId: couple.id,
       },
     });
 
@@ -42,12 +61,19 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', zodValidator(moodMessageSchema), async (req, res) => {
   try {
+    const userID = req.user!.userID;
+    const couple = await getPairedCouple(userID);
+    if (!couple) {
+      return res.status(403).json({ error: 'User is not in a paired couple' });
+    }
+
     const { mood, message } = req.body;
     const moodMessage = await prisma.moodMessage.create({
       data: {
         mood: mood as PrismaMood,
         message,
-        userId: req.user!.userID,
+        userId: userID,
+        coupleId: couple.id,
       },
     });
     return res.status(201).json({ moodMessage });
@@ -58,10 +84,17 @@ router.post('/', zodValidator(moodMessageSchema), async (req, res) => {
 
 router.patch('/:id', zodValidator(moodMessageUpdateSchema), async (req, res) => {
   try {
+    const userID = req.user!.userID;
+    const couple = await getPairedCouple(userID);
+    if (!couple) {
+      return res.status(403).json({ error: 'User is not in a paired couple' });
+    }
+
     const existing = await prisma.moodMessage.findFirst({
       where: {
         id: req.params.id as string,
-        userId: req.user!.userID,
+        userId: userID,
+        coupleId: couple.id,
       },
     });
 
@@ -90,10 +123,17 @@ router.patch('/:id', zodValidator(moodMessageUpdateSchema), async (req, res) => 
 
 router.delete('/:id', async (req, res) => {
   try {
+    const userID = req.user!.userID;
+    const couple = await getPairedCouple(userID);
+    if (!couple) {
+      return res.status(403).json({ error: 'User is not in a paired couple' });
+    }
+
     const existing = await prisma.moodMessage.findFirst({
       where: {
         id: req.params.id as string,
-        userId: req.user!.userID,
+        userId: userID,
+        coupleId: couple.id,
       },
     });
 

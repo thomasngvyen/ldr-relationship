@@ -6,6 +6,7 @@ import ErrorBanner from '../components/ErrorBanner'
 import LoadingSpinner from '../components/LoadingSpinner'
 import VisitCard from '../components/VisitCard'
 import VisitForm from '../components/VisitForm'
+import { isVisitUpcoming } from '../lib/visitDates'
 import './Dashboard.css'
 
 /**
@@ -16,14 +17,6 @@ import './Dashboard.css'
  */
 
 /**
- * @param {Visit} visit
- * @returns {boolean}
- */
-function isUpcoming(visit) {
-  return new Date(visit.end_date).getTime() >= Date.now()
-}
-
-/**
  * @param {Visit[]} visits
  * @returns {{ upcoming: Visit[], past: Visit[] }}
  */
@@ -32,7 +25,7 @@ function splitVisits(visits) {
   const past = []
 
   for (const visit of visits) {
-    if (isUpcoming(visit)) {
+    if (isVisitUpcoming(visit)) {
       upcoming.push(visit)
     } else {
       past.push(visit)

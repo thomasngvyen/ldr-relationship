@@ -51,17 +51,28 @@ export const AuthProvider = ({ children }) => {
         (token) => {
             clearExpiryTimer();
 
-            const remaining = msUntilExpiry(token);
-            if (remaining === 0) {
-                logout();
-                return;
-            }
+            const MAX_DELAY = 2_147_483_647;
 
-            // setTimeout max delay is ~24.8 days; clamp just in case of long-lived tokens
-            const delay = Math.min(remaining, 2_147_483_647);
-            expiryTimerRef.current = setTimeout(() => {
-                logout();
-            }, delay);
+            const arm = (tok) => {
+                const remaining = msUntilExpiry(tok);
+                if (remaining === 0) {
+                    logout();
+                    return;
+                }
+
+                // setTimeout max delay is ~24.8 days; reschedule if the token lives longer
+                const delay = Math.min(remaining, MAX_DELAY);
+                expiryTimerRef.current = setTimeout(() => {
+                    const current = localStorage.getItem('token');
+                    if (!current || msUntilExpiry(current) === 0) {
+                        logout();
+                        return;
+                    }
+                    arm(current);
+                }, delay);
+            };
+
+            arm(token);
         },
         [clearExpiryTimer, logout],
     );
@@ -71,8 +82,13 @@ export const AuthProvider = ({ children }) => {
         const savedUser = localStorage.getItem('user');
 
         if (token && savedUser && !isTokenExpired(token)) {
-            setUser(JSON.parse(savedUser));
-            scheduleLogout(token);
+            try {
+                setUser(JSON.parse(savedUser));
+                scheduleLogout(token);
+            } catch {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
         } else if (token || savedUser) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');

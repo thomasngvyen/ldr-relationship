@@ -12,8 +12,9 @@ export default function StaggeredMenu({
   displayItemNumbering = true,
   className = '',
   logoUrl = '/heartsync-logo.png',
-  menuButtonColor = '#831843',
-  openMenuButtonColor = '#831843',
+  logoLink = '/dashboard',
+  menuButtonColor = '#fff',
+  openMenuButtonColor = '#fff',
   changeMenuColorOnOpen = true,
   accentColor = '#ec4899',
   isFixed = false,
@@ -230,6 +231,7 @@ export default function StaggeredMenu({
     const layers = preLayerElsRef.current
     if (!panel) return
 
+    busyRef.current = true
     const all = [...layers, panel]
     closeTweenRef.current?.kill()
     const offscreen = position === 'left' ? -100 : 100
@@ -346,6 +348,7 @@ export default function StaggeredMenu({
   }, [])
 
   const closeMenu = useCallback(() => {
+    if (busyRef.current) return
     if (openRef.current) {
       openRef.current = false
       setOpen(false)
@@ -358,6 +361,7 @@ export default function StaggeredMenu({
   }, [playClose, animateIcon, animateColor, animateText, onMenuClose])
 
   const toggleMenu = useCallback(() => {
+    if (busyRef.current) return
     const target = !openRef.current
     openRef.current = target
     setOpen(target)
@@ -426,7 +430,7 @@ export default function StaggeredMenu({
       </div>
       <header className="staggered-menu-header" aria-label="Main navigation header">
         <div className="sm-logo" aria-label="Logo">
-          <Link to="/dashboard" onClick={closeMenu} className="sm-logo-link">
+          <Link to={logoLink} onClick={closeMenu} className="sm-logo-link">
             <img
               src={logoUrl}
               alt="HeartSync"

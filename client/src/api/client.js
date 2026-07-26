@@ -23,7 +23,8 @@ export const client = async (endpoint, { body, ...customConfig } = {}) => {
             if (response.status === 401 && !endpoint.startsWith('/api/auth/')) {
                 window.dispatchEvent(new CustomEvent('auth:unauthorized'));
             }
-            throw new Error(data.error ?? 'Request failed');
+            const validationMessage = formatValidationErrors(data.errors);
+            throw new Error(data.error ?? validationMessage ?? 'Request failed');
         }
         return data;
     } catch (error) {
@@ -36,3 +37,29 @@ export const client = async (endpoint, { body, ...customConfig } = {}) => {
         throw error;
     }
 };
+
+/**
+ * @param {unknown} errors
+ * @returns {string | null}
+ */
+function formatValidationErrors(errors) {
+    if (!errors || typeof errors !== 'object') return null;
+
+    const fieldErrors =
+        'fieldErrors' in errors && errors.fieldErrors && typeof errors.fieldErrors === 'object'
+            ? errors.fieldErrors
+            : null;
+
+    if (fieldErrors) {
+        const messages = Object.values(fieldErrors)
+            .flat()
+            .filter((value) => typeof value === 'string');
+        if (messages.length > 0) return messages.join(' ');
+    }
+
+    if ('formErrors' in errors && Array.isArray(errors.formErrors) && errors.formErrors.length > 0) {
+        return errors.formErrors.filter((value) => typeof value === 'string').join(' ');
+    }
+
+    return null;
+}

@@ -79,6 +79,13 @@ export default function Dashboard() {
             }
           }
         }
+      } catch (err) {
+        if (!cancelled) {
+          const message =
+            err instanceof Error ? err.message : 'Could not load your pairing status.'
+          setVisitsError(message)
+          setStatus(null)
+        }
       } finally {
         if (!cancelled) {
           setLoading(false)

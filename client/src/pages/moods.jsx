@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { client } from '../api/client'
 import DashboardOrbs from '../components/DashboardOrbs'
@@ -22,6 +22,7 @@ export default function Moods() {
   const [modalOpen, setModalOpen] = useState(false)
   const [delivering, setDelivering] = useState(false)
   const [deliverError, setDeliverError] = useState('')
+  const deliverGenRef = useRef(0)
 
   useEffect(() => {
     let cancelled = false
@@ -65,32 +66,42 @@ export default function Moods() {
 
     return () => {
       cancelled = true
+      deliverGenRef.current += 1
     }
   }, [])
 
   const deliverMood = useCallback(
     /** @param {string} mood */
     async (mood) => {
-    setSelectedMood(mood)
-    setModalOpen(true)
-    setDelivering(true)
-    setDeliverError('')
-    setMessage(null)
+      const gen = ++deliverGenRef.current
+      setSelectedMood(mood)
+      setModalOpen(true)
+      setDelivering(true)
+      setDeliverError('')
+      setMessage(null)
 
-    try {
-      const data = await client(`/api/moods/${mood}/deliver`, { method: 'POST' })
-      setMessage(data.moodMessage?.message ?? null)
-    } catch (err) {
-      const messageText =
-        err instanceof Error ? err.message : 'Could not get a message for that mood.'
-      setDeliverError(messageText)
-    } finally {
-      setDelivering(false)
-    }
-  }, [])
+      try {
+        const data = await client(`/api/moods/${mood}/deliver`, { method: 'POST' })
+        if (gen !== deliverGenRef.current) return
+        setMessage(data.moodMessage?.message ?? null)
+      } catch (err) {
+        if (gen !== deliverGenRef.current) return
+        const messageText =
+          err instanceof Error ? err.message : 'Could not get a message for that mood.'
+        setDeliverError(messageText)
+      } finally {
+        if (gen === deliverGenRef.current) {
+          setDelivering(false)
+        }
+      }
+    },
+    [],
+  )
 
   function closeModal() {
+    deliverGenRef.current += 1
     setModalOpen(false)
+    setDelivering(false)
     setDeliverError('')
     setMessage(null)
     setSelectedMood(null)

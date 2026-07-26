@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { client } from '../api/client'
 import { MQ } from '../constants/breakpoints'
 import { STATUS_COLUMNS, statusToColumn } from '../constants/dateIdeas'
@@ -15,6 +16,7 @@ export default function DateIdeaBoard() {
   const isTablet = useMediaQuery(MQ.tablet)
   const [activeColumn, setActiveColumn] = useState(STATUS_COLUMNS[0].key)
 
+  const [paired, setPaired] = useState(false)
   const [ideas, setIdeas] = useState(/** @type {DateIdea[]} */ ([]))
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(/** @type {string | null} */ (null))
@@ -30,11 +32,21 @@ export default function DateIdeaBoard() {
   useEffect(() => {
     let cancelled = false
 
-    async function fetchIdeas() {
+    async function loadBoard() {
       setLoading(true)
       setError(null)
 
       try {
+        const coupleData = await client('/api/couples/me')
+        if (cancelled) return
+
+        setPaired(Boolean(coupleData.paired))
+
+        if (!coupleData.paired) {
+          setIdeas([])
+          return
+        }
+
         const data = await client('/api/dateIdeas')
         if (!cancelled) {
           setIdeas(Array.isArray(data.dateIdeas) ? data.dateIdeas : [])
@@ -50,7 +62,7 @@ export default function DateIdeaBoard() {
       }
     }
 
-    fetchIdeas()
+    loadBoard()
 
     return () => {
       cancelled = true
@@ -217,6 +229,18 @@ export default function DateIdeaBoard() {
 
   if (loading) {
     return <LoadingSpinner label="Loading your date ideas..." />
+  }
+
+  if (!paired) {
+    return (
+      <p className="dashboard-page__text">
+        You need to be paired first.{' '}
+        <Link to="/pair" className="dashboard-page__link">
+          Connect with your partner
+        </Link>{' '}
+        to plan date ideas together.
+      </p>
+    )
   }
 
   const visibleColumns = isTablet

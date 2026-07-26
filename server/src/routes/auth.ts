@@ -7,6 +7,8 @@ import { zodValidator } from '../middleware/zodValidator';
 
 const router = Router();
 
+/** Valid bcrypt hash used only so missing-user logins take similar time */
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync('__timing_dummy__', 10);
 router.post('/register', zodValidator(registerSchema), async (req, res) => {
   try {
     const { displayName, email, password } = req.body;
@@ -30,22 +32,28 @@ router.post('/register', zodValidator(registerSchema), async (req, res) => {
   }
 });
 
-router.post('/login', zodValidator(loginSchema), async(req, res) => {
+router.post('/login', zodValidator(loginSchema), async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
+    // Always hash-compare so missing users don't respond faster than bad passwords
+    const passwordHash = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
+    const valid = await bcrypt.compare(password, passwordHash);
+
+    if (!user || !valid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    if (await bcrypt.compare(password, user.passwordHash)) {
-      const token = generateToken(user.id);
-      res.status(200).json({ user: { id: user.id, email: user.email, displayName: user.displayName }, token });
-    }
-    else {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-  }
-  catch(error){
+
+    const token = generateToken(user.id);
+    return res.status(200).json({
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName,
+      },
+      token,
+    });
+  } catch {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });

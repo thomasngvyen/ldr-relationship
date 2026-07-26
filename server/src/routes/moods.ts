@@ -39,6 +39,7 @@ router.post('/:mood/deliver', async (req, res) => {
       where: {
         mood: moodParam as PrismaMood,
         userId: partnerId,
+        coupleId: couple.id,
       },
     });
 

@@ -109,9 +109,24 @@ router.post('/:id/vote', async (req, res) => {
       return res.status(200).json({ voted: false, voteCount });
     }
 
-    await prisma.dateIdeaVote.create({
-      data: { dateIdeaId: dateIdea.id, userId: userID },
-    });
+    try {
+      await prisma.dateIdeaVote.create({
+        data: { dateIdeaId: dateIdea.id, userId: userID },
+      });
+    } catch (error) {
+      // Concurrent double-vote: treat as already voted
+      if (
+        !(
+          error &&
+          typeof error === 'object' &&
+          'code' in error &&
+          error.code === 'P2002'
+        )
+      ) {
+        throw error;
+      }
+    }
+
     const voteCount = await prisma.dateIdeaVote.count({
       where: { dateIdeaId: dateIdea.id },
     });
@@ -133,11 +148,23 @@ router.patch('/:id', zodValidator(updateDateIdeaSchema), async (req, res) => {
 
     const existing = await prisma.dateIdea.findFirst({
       where: { id, coupleId: couple.id },
-      select: { id: true },
+      select: { id: true, userId: true },
     });
 
     if (!existing) {
       return res.status(404).json({ error: 'Date idea not found' });
+    }
+
+    const bodyKeys = Object.keys(req.body);
+    const onlyStatus =
+      bodyKeys.length === 1 && req.body.status !== undefined;
+    const isCreator = existing.userId === userID;
+
+    // Anyone in the couple can move status; only the creator edits content
+    if (!isCreator && !onlyStatus) {
+      return res.status(403).json({
+        error: 'Only the person who added this idea can edit it',
+      });
     }
 
     const dateIdea = await prisma.dateIdea.update({
@@ -172,11 +199,17 @@ router.delete('/:id', async (req, res) => {
 
     const existing = await prisma.dateIdea.findFirst({
       where: { id, coupleId: couple.id },
-      select: { id: true },
+      select: { id: true, userId: true },
     });
 
     if (!existing) {
       return res.status(404).json({ error: 'Date idea not found' });
+    }
+
+    if (existing.userId !== userID) {
+      return res.status(403).json({
+        error: 'Only the person who added this idea can delete it',
+      });
     }
 
     await prisma.dateIdea.delete({ where: { id: existing.id } });

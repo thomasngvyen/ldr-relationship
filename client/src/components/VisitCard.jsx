@@ -1,35 +1,5 @@
+import { formatVisitDate, getVisitStatus } from '../lib/visitDates'
 import './VisitComponents.css'
-
-/**
- * @param {Date | string} value
- * @returns {string}
- */
-function formatVisitDate(value) {
-  const date = value instanceof Date ? value : new Date(value)
-  if (Number.isNaN(date.getTime())) return '—'
-
-  return new Intl.DateTimeFormat('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(date)
-}
-
-/**
- * @param {Date | string} start
- * @param {Date | string} end
- * @returns {'upcoming' | 'ongoing' | 'past'}
- */
-function getVisitStatus(start, end) {
-  const now = Date.now()
-  const startMs = new Date(start).getTime()
-  const endMs = new Date(end).getTime()
-
-  if (now < startMs) return 'upcoming'
-  if (now <= endMs) return 'ongoing'
-  return 'past'
-}
 
 const STATUS_LABEL = {
   upcoming: 'Upcoming',

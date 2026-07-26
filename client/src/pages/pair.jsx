@@ -234,9 +234,11 @@ export default function Pair() {
             <button
               type="button"
               className="auth-inline-btn"
-              onClick={() =>
-                setStatus({ paired: false, couple: null, partner: null })
-              }
+              onClick={async () => {
+                await handleUnpair()
+                setMode('join')
+              }}
+              disabled={submitting}
             >
               Enter it here
             </button>

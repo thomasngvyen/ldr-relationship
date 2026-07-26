@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { client } from '../api/client'
 import AuthShell from '../components/AuthShell'
 import ErrorBanner from '../components/ErrorBanner'
 import { useAuth } from '../context/AuthContext'
@@ -22,7 +23,12 @@ export default function Login() {
 
     try {
       await login({ email, password })
-      navigate('/pair')
+      try {
+        const coupleData = await client('/api/couples/me')
+        navigate(coupleData.paired ? '/dashboard' : '/pair')
+      } catch {
+        navigate('/pair')
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Invalid email or password. Please try again.';
       setError(message)

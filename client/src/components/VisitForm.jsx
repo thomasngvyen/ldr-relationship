@@ -1,17 +1,7 @@
 import { useState } from 'react'
+import { toDateInputValue } from '../lib/visitDates'
 import ErrorBanner from './ErrorBanner'
 import './VisitComponents.css'
-
-/**
- * @param {Date | string | undefined} value
- * @returns {string}
- */
-function toDateInputValue(value) {
-  if (!value) return ''
-  const date = value instanceof Date ? value : new Date(value)
-  if (Number.isNaN(date.getTime())) return ''
-  return date.toISOString().slice(0, 10)
-}
 
 /**
  * @param {Object} props
@@ -44,8 +34,8 @@ export default function VisitForm({
       return
     }
 
-    if (new Date(startDate) >= new Date(endDate)) {
-      setError('Start date must be before end date.')
+    if (new Date(startDate) > new Date(endDate)) {
+      setError('Start date must be on or before end date.')
       return
     }
 

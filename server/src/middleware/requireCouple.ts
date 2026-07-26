@@ -18,9 +18,12 @@ export const requireCouple = async(req: Request, res: Response, next: NextFuncti
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        if (!(user.coupleAsA || user.coupleAsB)) {
-            return res.status(403).json({ error: 'User is not in a couple' });
+
+        const couple = user.coupleAsA ?? user.coupleAsB;
+        if (!couple || !couple.userBId) {
+            return res.status(403).json({ error: 'User is not in a paired couple' });
         }
+
         next();
     } catch (error) {
         return res.status(500).json({ error: 'Internal server error' });
