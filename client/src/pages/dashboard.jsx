@@ -145,7 +145,7 @@ export default function Dashboard() {
 
       <section className="dashboard-page__content">
         <h1 className="dashboard-page__title">
-          Welcome{displayName ? `, ${displayName}` : ''}
+          Welcome{displayName ? `, ${displayName}` : '!'}!
         </h1>
 
         {loading ? (

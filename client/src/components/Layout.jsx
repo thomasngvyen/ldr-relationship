@@ -51,8 +51,8 @@ export default function Layout({ children }) {
         items={menuItems}
         displaySocials={false}
         displayItemNumbering={!isCompactMenu}
-        menuButtonColor="#fff"
-        openMenuButtonColor={isCompactMenu ? '#1a1a1a' : '#fff'}
+        menuButtonColor="#831843"
+        openMenuButtonColor="#831843"
         changeMenuColorOnOpen
         colors={['#f9a8d4', '#f472b6']}
         accentColor="#ec4899"

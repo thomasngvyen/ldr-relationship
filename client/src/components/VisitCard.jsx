@@ -55,7 +55,7 @@ export default function VisitCard({ visit, onEdit, onDelete, deleting = false })
         </span>
       </div>
 
-      <h3 className="visit-card__title">Next time together</h3>
+      <h3 className="visit-card__title">Next time together:</h3>
 
       <div className="visit-card__dates">
         <div className="visit-card__date-block">
