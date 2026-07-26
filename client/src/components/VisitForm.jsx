@@ -5,11 +5,12 @@ import './VisitComponents.css'
 
 /**
  * @param {Object} props
- * @param {{ start_date?: Date | string, end_date?: Date | string } | null} [props.initialValues]
- * @param {(values: { start_date: string, end_date: string }) => void | Promise<void>} props.onSubmit
+ * @param {{ start_date?: Date | string, end_date?: Date | string, visitingPartnerId?: string | null } | null} [props.initialValues]
+ * @param {(values: { start_date: string, end_date: string, visitingPartnerId: string }) => void | Promise<void>} props.onSubmit
  * @param {() => void} [props.onCancel]
  * @param {boolean} [props.submitting]
  * @param {string} [props.submitLabel]
+ * @param {{ userA: { id: string, displayName: string }, userB: { id: string, displayName: string } }} props.couple
  */
 export default function VisitForm({
   initialValues = null,
@@ -17,10 +18,15 @@ export default function VisitForm({
   onCancel,
   submitting = false,
   submitLabel = 'Save visit',
+  couple
 }) {
   const [startDate, setStartDate] = useState(() => toDateInputValue(initialValues?.start_date))
   const [endDate, setEndDate] = useState(() => toDateInputValue(initialValues?.end_date))
+  const [visitingPartner, setVisitingPartner] = useState(
+    () => initialValues?.visitingPartnerId || '',
+  )
   const [error, setError] = useState('')
+  const partners = [couple?.userA, couple?.userB].filter(Boolean)
 
   /**
    * @param {React.FormEvent<HTMLFormElement>} event
@@ -39,8 +45,13 @@ export default function VisitForm({
       return
     }
 
+    if (!visitingPartner) {
+      setError('Please select a visiting partner.')
+      return
+    }
+
     try {
-      await onSubmit({ start_date: startDate, end_date: endDate })
+      await onSubmit({ start_date: startDate, end_date: endDate, visitingPartnerId: visitingPartner })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Could not save this visit.'
       setError(message)
@@ -55,7 +66,7 @@ export default function VisitForm({
           {initialValues ? 'Update your visit' : 'When will you see each other?'}
         </h3>
         <p className="visit-form__subtitle">
-          Pick the dates for your next time together. Both of you will see the countdown.
+          Pick the dates and visiting partner for your next time together. Both of you will see the countdown.
         </p>
       </div>
 
@@ -85,6 +96,24 @@ export default function VisitForm({
             onChange={(event) => setEndDate(event.target.value)}
             required
           />
+        </div>
+
+        <div className="visit-form__field visit-form__field--full">
+          <label htmlFor="visit-visiting-partner">Who is visiting?</label>
+          <select
+            id="visit-visiting-partner"
+            name="visitingPartnerId"
+            value={visitingPartner}
+            onChange={(event) => setVisitingPartner(event.target.value)}
+            required
+          >
+            <option value="">Select who is traveling</option>
+            {partners.map((partner) => (
+              <option key={partner.id} value={partner.id}>
+                {partner.displayName}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

@@ -9,13 +9,20 @@ const STATUS_LABEL = {
 
 /**
  * @param {Object} props
- * @param {{ id?: string, start_date: Date | string, end_date: Date | string }} props.visit
+ * @param {{
+ *   id?: string,
+ *   start_date: Date | string,
+ *   end_date: Date | string,
+ *   visitingPartnerId?: string | null,
+ *   visitingPartner?: { id: string, displayName: string } | null,
+ * }} props.visit
  * @param {() => void} [props.onEdit]
  * @param {() => void} [props.onDelete]
  * @param {boolean} [props.deleting]
  */
 export default function VisitCard({ visit, onEdit, onDelete, deleting = false }) {
   const status = getVisitStatus(visit.start_date, visit.end_date)
+  const travelerName = visit.visitingPartner?.displayName
 
   return (
     <article className={`visit-card visit-card--${status}`}>
@@ -25,7 +32,14 @@ export default function VisitCard({ visit, onEdit, onDelete, deleting = false })
         </span>
       </div>
 
-      <h3 className="visit-card__title">Next time together:</h3>
+      <h3 className="visit-card__title">Next time together</h3>
+
+      {travelerName ? (
+        <p className="visit-card__traveler">
+          <span className="visit-card__traveler-label">Visiting</span>
+          <span className="visit-card__traveler-name">{travelerName}</span>
+        </p>
+      ) : null}
 
       <div className="visit-card__dates">
         <div className="visit-card__date-block">

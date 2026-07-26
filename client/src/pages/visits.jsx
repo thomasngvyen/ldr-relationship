@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { client } from '../api/client'
+import { useAuth } from '../context/AuthContext'
 import DashboardOrbs from '../components/DashboardOrbs'
 import ErrorBanner from '../components/ErrorBanner'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -10,10 +11,18 @@ import { isVisitUpcoming } from '../lib/visitDates'
 import './Dashboard.css'
 
 /**
+ * @typedef {Object} CoupleMember
+ * @property {string} id
+ * @property {string} displayName
+ */
+
+/**
  * @typedef {Object} Visit
  * @property {string} id
  * @property {string} start_date
  * @property {string} end_date
+ * @property {string | null} [visitingPartnerId]
+ * @property {CoupleMember | null} [visitingPartner]
  */
 
 /**
@@ -42,8 +51,39 @@ function splitVisits(visits) {
   return { upcoming, past }
 }
 
+/**
+ * Build { userA, userB } for VisitForm from /couples/me + auth user.
+ * @param {{ id?: string, displayName?: string } | null} user
+ * @param {{
+ *   couple?: { userAId?: string | null, userBId?: string | null } | null,
+ *   partner?: CoupleMember | null,
+ * } | null} status
+ */
+function buildCoupleForForm(user, status) {
+  if (!user?.id || !user.displayName || !status?.couple?.userAId || !status?.couple?.userBId) {
+    return null
+  }
+  if (!status.partner?.id || !status.partner.displayName) {
+    return null
+  }
+
+  const me = { id: user.id, displayName: user.displayName }
+  const partner = {
+    id: status.partner.id,
+    displayName: status.partner.displayName,
+  }
+
+  if (status.couple.userAId === me.id) {
+    return { userA: me, userB: partner }
+  }
+
+  return { userA: partner, userB: me }
+}
+
 export default function Visits() {
+  const { user } = useAuth()
   const [paired, setPaired] = useState(false)
+  const [coupleStatus, setCoupleStatus] = useState(/** @type {object | null} */ (null))
   const [visits, setVisits] = useState(/** @type {Visit[]} */ ([]))
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -51,6 +91,11 @@ export default function Visits() {
   const [editingVisit, setEditingVisit] = useState(/** @type {Visit | null} */ (null))
   const [submitting, setSubmitting] = useState(false)
   const [deletingId, setDeletingId] = useState(/** @type {string | null} */ (null))
+
+  const couple = useMemo(
+    () => buildCoupleForForm(/** @type {{ id?: string, displayName?: string } | null} */ (user), coupleStatus),
+    [user, coupleStatus],
+  )
 
   const loadVisits = useCallback(async () => {
     setError('')
@@ -74,6 +119,7 @@ export default function Visits() {
         if (cancelled) return
 
         setPaired(Boolean(coupleData.paired))
+        setCoupleStatus(coupleData)
 
         if (coupleData.paired) {
           try {
@@ -110,7 +156,7 @@ export default function Visits() {
   }, [])
 
   /**
-   * @param {{ start_date: string, end_date: string }} values
+   * @param {{ start_date: string, end_date: string, visitingPartnerId: string }} values
    */
   async function handleSaveVisit(values) {
     setSubmitting(true)
@@ -185,17 +231,30 @@ export default function Visits() {
             <ErrorBanner message={error} onDismiss={() => setError('')} />
 
             {showForm ? (
-              <VisitForm
-                key={editingVisit ? editingVisit.id : 'new-visit'}
-                initialValues={editingVisit}
-                onSubmit={handleSaveVisit}
-                onCancel={() => {
-                  setShowForm(false)
-                  setEditingVisit(null)
-                }}
-                submitting={submitting}
-                submitLabel={editingVisit ? 'Update visit' : 'Add visit'}
-              />
+              couple ? (
+                <VisitForm
+                  key={editingVisit ? editingVisit.id : 'new-visit'}
+                  initialValues={
+                    editingVisit
+                      ? {
+                          start_date: editingVisit.start_date,
+                          end_date: editingVisit.end_date,
+                          visitingPartnerId: editingVisit.visitingPartnerId ?? undefined,
+                        }
+                      : null
+                  }
+                  couple={couple}
+                  onSubmit={handleSaveVisit}
+                  onCancel={() => {
+                    setShowForm(false)
+                    setEditingVisit(null)
+                  }}
+                  submitting={submitting}
+                  submitLabel={editingVisit ? 'Update visit' : 'Add visit'}
+                />
+              ) : (
+                <ErrorBanner message="Could not load couple members for the visit form." />
+              )
             ) : (
               <button
                 type="button"

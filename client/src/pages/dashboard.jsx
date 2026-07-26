@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { client } from '../api/client'
 import { useAuth } from '../context/AuthContext'
@@ -11,10 +11,16 @@ import VisitForm from '../components/VisitForm'
 import './Dashboard.css'
 
 /**
+ * @typedef {Object} CoupleMember
+ * @property {string} id
+ * @property {string} displayName
+ */
+
+/**
  * @typedef {Object} CoupleStatus
  * @property {boolean} paired
- * @property {{ id: string, inviteCode: string | null } | null} couple
- * @property {{ displayName: string } | null} partner
+ * @property {{ id: string, inviteCode: string | null, userAId?: string | null, userBId?: string | null } | null} couple
+ * @property {CoupleMember | null} partner
  */
 
 /**
@@ -22,7 +28,34 @@ import './Dashboard.css'
  * @property {string} id
  * @property {string} start_date
  * @property {string} end_date
+ * @property {string | null} [visitingPartnerId]
+ * @property {CoupleMember | null} [visitingPartner]
  */
+
+/**
+ * @param {{ id?: string, displayName?: string } | null} user
+ * @param {CoupleStatus | null} status
+ */
+function buildCoupleForForm(user, status) {
+  if (!user?.id || !user.displayName || !status?.couple?.userAId || !status?.couple?.userBId) {
+    return null
+  }
+  if (!status.partner?.id || !status.partner.displayName) {
+    return null
+  }
+
+  const me = { id: user.id, displayName: user.displayName }
+  const partner = {
+    id: status.partner.id,
+    displayName: status.partner.displayName,
+  }
+
+  if (status.couple.userAId === me.id) {
+    return { userA: me, userB: partner }
+  }
+
+  return { userA: partner, userB: me }
+}
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -34,6 +67,11 @@ export default function Dashboard() {
   const [showForm, setShowForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [deleting, setDeleting] = useState(false)
+
+  const couple = useMemo(
+    () => buildCoupleForForm(/** @type {{ id?: string, displayName?: string } | null} */ (user), status),
+    [user, status],
+  )
 
   const loadNextVisit = useCallback(async () => {
     setVisitsError('')
@@ -101,7 +139,7 @@ export default function Dashboard() {
   }, [])
 
   /**
-   * @param {{ start_date: string, end_date: string }} values
+   * @param {{ start_date: string, end_date: string, visitingPartnerId: string }} values
    */
   async function handleSaveVisit(values) {
     setSubmitting(true)
@@ -200,21 +238,34 @@ export default function Dashboard() {
             )}
 
             {showForm ? (
-              <VisitForm
-                key={editing && nextVisit ? nextVisit.id : 'new-visit'}
-                initialValues={editing && nextVisit ? nextVisit : null}
-                onSubmit={handleSaveVisit}
-                onCancel={
-                  nextVisit
-                    ? () => {
-                        setShowForm(false)
-                        setEditing(false)
-                      }
-                    : undefined
-                }
-                submitting={submitting}
-                submitLabel={editing ? 'Update visit' : 'Plan visit'}
-              />
+              couple ? (
+                <VisitForm
+                  key={editing && nextVisit ? nextVisit.id : 'new-visit'}
+                  initialValues={
+                    editing && nextVisit
+                      ? {
+                          start_date: nextVisit.start_date,
+                          end_date: nextVisit.end_date,
+                          visitingPartnerId: nextVisit.visitingPartnerId ?? undefined,
+                        }
+                      : null
+                  }
+                  couple={couple}
+                  onSubmit={handleSaveVisit}
+                  onCancel={
+                    nextVisit
+                      ? () => {
+                          setShowForm(false)
+                          setEditing(false)
+                        }
+                      : undefined
+                  }
+                  submitting={submitting}
+                  submitLabel={editing ? 'Update visit' : 'Plan visit'}
+                />
+              ) : (
+                <ErrorBanner message="Could not load couple members for the visit form." />
+              )
             ) : (
               <button
                 type="button"

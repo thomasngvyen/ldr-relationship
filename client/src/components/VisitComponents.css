@@ -75,11 +75,38 @@
 }
 
 .visit-card__title {
-  margin: 0 0 1.15rem;
+  margin: 0 0 0.85rem;
   color: #831843;
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.2;
+}
+
+.visit-card__traveler {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.75rem;
+  margin: 0 0 1.15rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(244, 114, 182, 0.22);
+  background: linear-gradient(120deg, rgba(252, 231, 243, 0.9), rgba(255, 228, 230, 0.85));
+}
+
+.visit-card__traveler-label {
+  color: #9d174d;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.visit-card__traveler-name {
+  color: #831843;
+  font-size: 0.98rem;
+  font-weight: 700;
 }
 
 .visit-card__dates {
@@ -246,7 +273,12 @@
   letter-spacing: 0.02em;
 }
 
-.visit-form__field input {
+.visit-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.visit-form__field input,
+.visit-form__field select {
   width: 100%;
   padding: 0.85rem 1rem;
   border: 1px solid rgba(244, 114, 182, 0.25);
@@ -261,7 +293,23 @@
     transform 0.2s ease;
 }
 
-.visit-form__field input:focus {
+.visit-form__field select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #be185d 50%),
+    linear-gradient(135deg, #be185d 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.15rem) calc(50% - 0.18rem),
+    calc(100% - 0.85rem) calc(50% - 0.18rem);
+  background-size:
+    0.35rem 0.35rem,
+    0.35rem 0.35rem;
+  background-repeat: no-repeat;
+  padding-right: 2.4rem;
+  cursor: pointer;
+}
+
+.visit-form__field input:focus,
+.visit-form__field select:focus {
   border-color: #f472b6;
   box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.18);
   transform: translateY(-1px);
