@@ -36,8 +36,7 @@ export default function VisitCard({ visit, onEdit, onDelete, deleting = false })
 
       {travelerName ? (
         <p className="visit-card__traveler">
-          <span className="visit-card__traveler-label">Visiting</span>
-          <span className="visit-card__traveler-name">{travelerName}</span>
+          <span className="visit-card__traveler-label">Visiting: <strong>{travelerName}</strong></span>
         </p>
       ) : null}
 
