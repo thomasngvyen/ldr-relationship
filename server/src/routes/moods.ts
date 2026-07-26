@@ -18,7 +18,7 @@ router.get('/', async (_req, res) => {
   }
 });
 
-// Pick a random curated message for this mood from either partner's library
+// Pick a random message written by the partner for this mood
 router.post('/:mood/deliver', async (req, res) => {
   try {
     const moodParam = req.params.mood;
@@ -32,16 +32,20 @@ router.post('/:mood/deliver', async (req, res) => {
       return res.status(403).json({ error: 'User is not in a couple' });
     }
 
-    const authorIds = [couple.userAId, couple.userBId];
+    const partnerId =
+      couple.userAId === userID ? couple.userBId : couple.userAId;
+
     const messages = await prisma.moodMessage.findMany({
       where: {
         mood: moodParam as PrismaMood,
-        userId: { in: authorIds },
+        userId: partnerId,
       },
     });
 
     if (messages.length === 0) {
-      return res.status(404).json({ error: 'No messages for this mood yet' });
+      return res.status(404).json({
+        error: 'No messages from your partner for this mood yet',
+      });
     }
 
     const moodMessage = messages[Math.floor(Math.random() * messages.length)];
