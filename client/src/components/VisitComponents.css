@@ -103,11 +103,6 @@
   opacity: 0.85;
 }
 
-.visit-card__traveler-name {
-  color: #831843;
-  font-size: 0.98rem;
-  font-weight: 700;
-}
 
 .visit-card__dates {
   display: grid;
