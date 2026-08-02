@@ -7,7 +7,8 @@ import { isTokenExpired, msUntilExpiry } from '../lib/jwt';
  * @property {Object|null} user
  * @property {boolean} loading
  * @property {(credentials: { email: string, password: string }) => Promise<Object>} login
- * @property {(credentials: { displayName?: string, email: string, password: string }) => Promise<Object>} register
+ * @property {(credentials: { displayName?: string, email: string, password: string, phoneNumber?: string, phoneCarrier?: string }) => Promise<Object>} register
+ * @property {(profile: { phoneNumber?: string, phoneCarrier?: string }) => Promise<Object>} updateProfile
  * @property {() => void} logout
  */
 
@@ -137,6 +138,8 @@ export const AuthProvider = ({ children }) => {
      * @param {string} [credentials.displayName]
      * @param {string} credentials.email
      * @param {string} credentials.password
+     * @param {string} [credentials.phoneNumber]
+     * @param {string} [credentials.phoneCarrier]
      * @returns {Promise<Object>}
      */
     const register = async (credentials) => {
@@ -148,8 +151,19 @@ export const AuthProvider = ({ children }) => {
         return data.user;
     };
 
+    /**
+     * @param {{ phoneNumber?: string, phoneCarrier?: string }} profile
+     * @returns {Promise<Object>}
+     */
+    const updateProfile = async (profile) => {
+        const data = await client('/api/auth/me', { method: 'PATCH', body: profile });
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+        return data.user;
+    };
+
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, register, updateProfile, logout }}>
             {children}
         </AuthContext.Provider>
     );
