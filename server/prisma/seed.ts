@@ -18,7 +18,7 @@ const AUTHOR_EMAIL = 'you@test.com'
 const PARTNER_EMAIL = 'partner@test.com'
 const SEED_PASSWORD = 'password123'
 
-/** 3â€“5 starter messages per mood */
+/** 3-5 starter messages per mood */
 const STARTER_MESSAGES: Record<Mood, string[]> = {
   HAPPY: [
     'Your smile lights up my entire world. I love seeing you this happy!',
@@ -34,14 +34,14 @@ const STARTER_MESSAGES: Record<Mood, string[]> = {
   ],
   ANGRY: [
     "It's valid to feel upset. I'm here whenever you want to vent.",
-    "I'm on your team, always. Breathe â€” we'll tackle this when you're ready.",
+    "I'm on your team, always. Breathe — we'll tackle this when you're ready.",
     "If you need space, take it. I'll be right here waiting.",
     'That sounds unfair. Want to talk it out?',
   ],
   EXCITED: [
     'Your energy is contagious! I cannot wait to see what happens next.',
     "Yes! You deserve this. I'm cheering you on every step.",
-    'Tell me every detail â€” I want to hear it all.',
+    'Tell me every detail — I want to hear it all.',
     'Your passion is one of my favorite things about you. Go crush it!',
   ],
   CONFUSED: [
@@ -53,11 +53,11 @@ const STARTER_MESSAGES: Record<Mood, string[]> = {
   BORED: [
     'Want a spontaneous adventure, or should we be bored together?',
     "Sending a little reminder that I'm thinking of you right now.",
-    "Let's brainstorm something fun â€” or order food and do nothing.",
+    "Let's brainstorm something fun — or order food and do nothing.",
     "If you're watching the clock, I'm counting down until I see you.",
   ],
   TIRED: [
-    "You've been working so hard. Rest â€” you've earned it.",
+    "You've been working so hard. Rest — you've earned it.",
     'Go get some sleep, my love. Everything else can wait.',
     'Unplug for the night. The world will still be there tomorrow.',
     "You can't pour from an empty cup. Take tonight to recharge.",
@@ -71,14 +71,14 @@ const STARTER_MESSAGES: Record<Mood, string[]> = {
   STRESSED: [
     'Close your eyes and take a deep breath. You are doing great.',
     "Don't carry it all alone. Let me help lighten the load.",
-    'One thing at a time. You can handle this â€” and not alone.',
+    'One thing at a time. You can handle this — and not alone.',
     "No matter how chaotic it gets, I'm your safe place to land.",
   ],
   RELAXED: [
     'Seeing you peaceful brings me so much joy. Enjoy this quiet.',
     'This is the peace you deserve. Stay here a little longer.',
     'Nothing better than soaking in the quiet with you.',
-    "No rush, no worries â€” just us. Let's make it last.",
+    "No rush, no worries — just us. Let's make it last.",
   ],
   HORNY: [
     "I've been thinking about you all day. I miss being close to you.",
@@ -86,17 +86,13 @@ const STARTER_MESSAGES: Record<Mood, string[]> = {
     'Missing your touch more than I can say.',
   ],
   SLEEPY: [
-    'Put the screens away and get comfortable. Sweet dreams â€” I love you.',
+    'Put the screens away and get comfortable. Sweet dreams — I love you.',
     'Rest well tonight. Dream of wonderful things.',
     "Close your eyes and let today go. I'll be here in the morning.",
     'Sleep tight. Sending you a gentle goodnight kiss.',
   ],
 }
 
-/**
- * @param {string} userId
- * @param {string} coupleId
- */
 function buildRowsForUser(userId: string, coupleId: string) {
   return (Object.entries(STARTER_MESSAGES) as [Mood, string[]][]).flatMap(
     ([mood, messages]) =>
@@ -155,7 +151,6 @@ async function main() {
     },
   })
 
-  // Seed both partners so either account gets messages when tapping moods
   await seedLibraryForUser(author.id, couple.id, author.email)
   await seedLibraryForUser(partner.id, couple.id, partner.email)
 

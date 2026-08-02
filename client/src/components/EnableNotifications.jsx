@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
+  isPushEnabled,
   isPushSupported,
   needsHomeScreenInstall,
   subscribeToPush,
@@ -7,45 +8,91 @@ import {
 import './EnableNotifications.css'
 
 /**
- * Prompt to enable Web Push. Must be triggered by a user gesture.
+ * @typedef {'checking' | 'hidden' | 'prompt' | 'working' | 'error'} EnableNotifView
+ */
+
+/**
+ * Prompt to enable Web Push. Hidden when push is already active.
+ * Must be triggered by a user gesture to subscribe.
  */
 export default function EnableNotifications() {
-  const [status, setStatus] = useState(/** @type {'idle' | 'working' | 'done' | 'error'} */ ('idle'))
+  const [view, setView] = useState(
+    /** @type {EnableNotifView} */ ('checking'),
+  )
   const [message, setMessage] = useState('')
 
-  if (!isPushSupported() && !needsHomeScreenInstall()) {
-    return null
-  }
+  const refresh = useCallback(async () => {
+    if (!isPushSupported() && !needsHomeScreenInstall()) {
+      setView('hidden')
+      return
+    }
+
+    // iOS Safari in browser tab: still show Home Screen instructions
+    if (needsHomeScreenInstall()) {
+      setView('prompt')
+      return
+    }
+
+    if (!isPushSupported()) {
+      setView('hidden')
+      return
+    }
+
+    const enabled = await isPushEnabled()
+    setView(enabled ? 'hidden' : 'prompt')
+    if (enabled) setMessage('')
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function run() {
+      await refresh()
+      if (cancelled) return
+    }
+
+    run()
+
+    function onVisible() {
+      if (document.visibilityState === 'visible') {
+        void refresh()
+      }
+    }
+
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', onVisible)
+
+    return () => {
+      cancelled = true
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', onVisible)
+    }
+  }, [refresh])
 
   /**
    * @param {React.MouseEvent<HTMLButtonElement>} event
    */
   async function handleEnable(event) {
     event.preventDefault()
-    setStatus('working')
+    setView('working')
     setMessage('')
 
     try {
       const result = await subscribeToPush()
       if (result.ok) {
-        setStatus('done')
-        setMessage('Notifications enabled. Your partner’s updates can reach this device.')
+        setView('hidden')
         return
       }
-      setStatus('error')
+      setView('error')
       setMessage(result.reason ?? 'Could not enable notifications.')
     } catch (err) {
-      setStatus('error')
+      setView('error')
       setMessage(err instanceof Error ? err.message : 'Could not enable notifications.')
     }
   }
 
-  if (status === 'done') {
-    return (
-      <div className="enable-notifications enable-notifications--done" role="status">
-        <p>{message}</p>
-      </div>
-    )
+  if (view === 'checking' || view === 'hidden') {
+    return null
   }
 
   return (
@@ -63,12 +110,12 @@ export default function EnableNotifications() {
           type="button"
           className="enable-notifications__button"
           onClick={handleEnable}
-          disabled={status === 'working'}
+          disabled={view === 'working'}
         >
-          {status === 'working' ? 'Enabling…' : 'Enable notifications'}
+          {view === 'working' ? 'Enabling…' : 'Enable notifications'}
         </button>
       )}
-      {status === 'error' && message ? (
+      {view === 'error' && message ? (
         <p className="enable-notifications__error" role="alert">
           {message}
         </p>

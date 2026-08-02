@@ -13,6 +13,7 @@ model User {
   displayName  String   @map("display_name")
   createdAt    DateTime @default(now()) @map("created_at")
 
+<<<<<<< HEAD
   coupleAsA         Couple?            @relation("UserA")
   coupleAsB         Couple?            @relation("UserB")
   moodMessages      MoodMessage[]      @relation("UserMoodMessages")
@@ -22,6 +23,15 @@ model User {
   memoryImages      MemoryImage[]      @relation("UserMemoryImages")
   feelings          Feeling[]          @relation("UserFeelings")
   pushSubscriptions PushSubscription[]
+=======
+  coupleAsA     Couple?         @relation("UserA")
+  coupleAsB     Couple?         @relation("UserB")
+  moodMessages  MoodMessage[]   @relation("UserMoodMessages")
+  dateIdeas     DateIdea[]      @relation("UserDateIdeas")
+  dateIdeaVotes DateIdeaVote[]  @relation("UserDateIdeaVotes")
+  visits        Visit[]         @relation("VisitingPartner")
+  memoryImages  MemoryImage[]   @relation("UserMemoryImages")
+>>>>>>> 19fad7b85246783c22ed8cdc290639aa706f1450
 
   @@map("users")
 }
@@ -40,7 +50,10 @@ model Couple {
   dateIdeas    DateIdea[]    @relation("CoupleDateIdeas")
   moodMessages MoodMessage[] @relation("CoupleMoodMessages")
   memories     Memory[]      @relation("CoupleMemories")
+<<<<<<< HEAD
   feelings     Feeling[]     @relation("CoupleFeelings")
+=======
+>>>>>>> 19fad7b85246783c22ed8cdc290639aa706f1450
 
   @@map("couples")
 }

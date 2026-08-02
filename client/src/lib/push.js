@@ -43,6 +43,26 @@ export async function registerServiceWorker() {
 }
 
 /**
+ * True when the browser has notification permission and an active push subscription.
+ * @returns {Promise<boolean>}
+ */
+export async function isPushEnabled() {
+  if (!isPushSupported()) return false;
+  if (Notification.permission !== 'granted') return false;
+
+  try {
+    const registration =
+      (await navigator.serviceWorker.getRegistration()) ??
+      (await registerServiceWorker());
+    await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    return Boolean(subscription);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Request permission, subscribe, and store the subscription on the API.
  * @returns {Promise<{ ok: boolean, reason?: string }>}
  */

@@ -76,6 +76,13 @@
   font-weight: 700;
   line-height: 1.2;
 }
+.dashboard-page__lead {
+  margin: 0.5rem 0 0;
+  color: #9d174d;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.9;
+}
 
 .dashboard-page__text {
   margin: 0.5rem 0 0;
