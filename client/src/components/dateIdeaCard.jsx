@@ -69,7 +69,8 @@ export default function DateIdeaCard({
               type="button"
               className="idea-card__btn idea-card__btn--primary"
               onClick={() => onStatusChange(idea, isSelected ? 'COMPLETED' : 'SELECTED')}
-              disabled={updating}
+              disabled={updating || (!isSelected && idea.voteCount !==2)}
+              title={!isSelected && idea.voteCount !==2 ? 'This idea must have exactly 2 votes to be marked as selected' : undefined}
             >
               {updating ? 'Saving…' : isSelected ? 'Mark done' : 'Plan it'}
             </button>

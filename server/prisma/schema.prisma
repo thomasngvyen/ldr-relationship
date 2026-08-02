@@ -15,7 +15,6 @@ model User {
 
   coupleAsA Couple? @relation("UserA")
   coupleAsB Couple? @relation("UserB")
-  moodMessages MoodMessage[] @relation("UserMoodMessages")
   dateIdeas DateIdea[] @relation("UserDateIdeas")
   dateIdeaVotes DateIdeaVote[] @relation("UserDateIdeaVotes")
   visits Visit[] @relation("VisitingPartner")
@@ -35,7 +34,6 @@ model Couple {
 
   visits       Visit[]        @relation("CoupleVisits")
   dateIdeas    DateIdea[]     @relation("CoupleDateIdeas")
-  moodMessages MoodMessage[]  @relation("CoupleMoodMessages")
   memories     Memory[]       @relation("CoupleMemories")
 
   @@map("couples")
@@ -55,33 +53,7 @@ model Visit {
   @@map("visits")
 }
 
-enum Mood {
-  HAPPY
-  SAD
-  ANGRY
-  EXCITED
-  CONFUSED
-  BORED
-  TIRED
-  SICK
-  STRESSED
-  RELAXED
-  HORNY
-  SLEEPY
-}
 
-model MoodMessage {
-  id        String   @id @default(cuid())
-  mood      Mood
-  message   String
-  createdAt DateTime @default(now())
-  userId    String   @map("user_id")
-  coupleId  String   @map("couple_id")
-  user      User     @relation("UserMoodMessages", fields: [userId], references: [id])
-  couple    Couple   @relation("CoupleMoodMessages", fields: [coupleId], references: [id], map: "mood_messages_couple_fkey", onDelete: Cascade)
-
-  @@map("mood_messages")
-}
 
 model DateIdea {
   id          String           @id @default(cuid())
