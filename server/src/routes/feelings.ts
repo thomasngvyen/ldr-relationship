@@ -90,7 +90,7 @@ router.post('/', zodValidator(feelingSchema), async (req, res) => {
     if (partnerId) {
       const name = sender?.displayName ?? 'Your partner';
       void sendPushToUser(partnerId, {
-        title: `${name} shared that they're feeling ${newFeeling.feeling.toLowerCase().trim().replace(/\s+/g, ' ')}!`,
+        title: `${name} is feeling ${newFeeling.feeling.toLowerCase().trim().replace(/\s+/g, ' ')}!`,
         body: 'Open HeartSync to see why.',
         url: '/feelings',
       }).catch((err) => {
