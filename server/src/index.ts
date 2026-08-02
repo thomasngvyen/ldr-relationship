@@ -13,6 +13,7 @@ import { authMiddleware } from './middleware/auth';
 import { requireCouple } from './middleware/requireCouple';
 import dateIdeasRouter from './routes/dateIdeas';
 import memoriesRouter from './routes/memories';
+import feelingsRouter from './routes/feelings';
 import rateLimit from './middleware/rateLimit';
 import { MEMORY_UPLOAD_DIR } from './lib/memoryUploads';
 
@@ -37,6 +38,7 @@ app.use('/api/moods', authMiddleware, requireCouple, moodsRouter);
 app.use('/api/moodMessages', authMiddleware, requireCouple, moodMessagesRouter);
 app.use('/api/dateIdeas', authMiddleware, requireCouple, dateIdeasRouter);
 app.use('/api/memories', authMiddleware, requireCouple, memoriesRouter);
+app.use('/api/feelings', authMiddleware, requireCouple, feelingsRouter);
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });

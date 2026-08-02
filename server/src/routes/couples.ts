@@ -188,6 +188,7 @@ router.delete('/me', authMiddleware, async (req, res) => {
       });
       await tx.memory.deleteMany({ where: { coupleId: couple.id } });
       await tx.moodMessage.deleteMany({ where: { coupleId: couple.id } });
+      await tx.feeling.deleteMany({ where: { coupleId: couple.id } });
       await tx.dateIdea.deleteMany({ where: { coupleId: couple.id } });
       await tx.visit.deleteMany({ where: { coupleId: couple.id } });
       await tx.couple.delete({ where: { id: couple.id } });
