@@ -13,12 +13,14 @@ model User {
   displayName  String   @map("display_name")
   createdAt    DateTime @default(now()) @map("created_at")
 
-  coupleAsA Couple? @relation("UserA")
-  coupleAsB Couple? @relation("UserB")
-  dateIdeas DateIdea[] @relation("UserDateIdeas")
-  dateIdeaVotes DateIdeaVote[] @relation("UserDateIdeaVotes")
-  visits Visit[] @relation("VisitingPartner")
-  memoryImages MemoryImage[] @relation("UserMemoryImages")
+  coupleAsA     Couple?         @relation("UserA")
+  coupleAsB     Couple?         @relation("UserB")
+  moodMessages  MoodMessage[]   @relation("UserMoodMessages")
+  dateIdeas     DateIdea[]      @relation("UserDateIdeas")
+  dateIdeaVotes DateIdeaVote[]  @relation("UserDateIdeaVotes")
+  visits        Visit[]         @relation("VisitingPartner")
+  memoryImages  MemoryImage[]   @relation("UserMemoryImages")
+
   @@map("users")
 }
 
@@ -32,28 +34,55 @@ model Couple {
   userA User  @relation("UserA", fields: [userAId], references: [id], map: "couples_user_a_fkey")
   userB User? @relation("UserB", fields: [userBId], references: [id], map: "couples_user_b_fkey")
 
-  visits       Visit[]        @relation("CoupleVisits")
-  dateIdeas    DateIdea[]     @relation("CoupleDateIdeas")
-  memories     Memory[]       @relation("CoupleMemories")
+  visits       Visit[]       @relation("CoupleVisits")
+  dateIdeas    DateIdea[]    @relation("CoupleDateIdeas")
+  moodMessages MoodMessage[] @relation("CoupleMoodMessages")
+  memories     Memory[]      @relation("CoupleMemories")
 
   @@map("couples")
 }
 
 model Visit {
-  id         String   @id @default(cuid())
-  start_date DateTime @map("start_date")
-  end_date   DateTime @map("end_date")
-  coupleId   String   @map("couple_id")
-  couple     Couple   @relation("CoupleVisits", fields: [coupleId], references: [id], map: "visits_couple_fkey")
-  createdAt  DateTime @default(now()) @map("created_at")
-  visitingPartnerId String? @map("visiting_partner_id")
-  visitingPartner User? @relation("VisitingPartner", fields: [visitingPartnerId], references: [id], map: "visits_visiting_partner_fkey")
-  memory Memory? @relation("VisitMemory")
+  id                String   @id @default(cuid())
+  start_date        DateTime @map("start_date")
+  end_date          DateTime @map("end_date")
+  coupleId          String   @map("couple_id")
+  couple            Couple   @relation("CoupleVisits", fields: [coupleId], references: [id], map: "visits_couple_fkey")
+  createdAt         DateTime @default(now()) @map("created_at")
+  visitingPartnerId String?  @map("visiting_partner_id")
+  visitingPartner   User?    @relation("VisitingPartner", fields: [visitingPartnerId], references: [id], map: "visits_visiting_partner_fkey")
+  memory            Memory?  @relation("VisitMemory")
 
   @@map("visits")
 }
 
+enum Mood {
+  HAPPY
+  SAD
+  ANGRY
+  EXCITED
+  CONFUSED
+  BORED
+  TIRED
+  SICK
+  STRESSED
+  RELAXED
+  HORNY
+  SLEEPY
+}
 
+model MoodMessage {
+  id        String   @id @default(cuid())
+  mood      Mood
+  message   String
+  createdAt DateTime @default(now())
+  userId    String   @map("user_id")
+  coupleId  String   @map("couple_id")
+  user      User     @relation("UserMoodMessages", fields: [userId], references: [id])
+  couple    Couple   @relation("CoupleMoodMessages", fields: [coupleId], references: [id], map: "mood_messages_couple_fkey", onDelete: Cascade)
+
+  @@map("mood_messages")
+}
 
 model DateIdea {
   id          String           @id @default(cuid())
@@ -62,7 +91,7 @@ model DateIdea {
   category    DateIdeaCategory
   status      DateIdeaStatus   @default(IDEA)
   coupleId    String           @map("couple_id")
-  userId      String           @map("user_id") // creator
+  userId      String           @map("user_id")
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @updatedAt @map("updated_at")
 
@@ -114,9 +143,9 @@ model Memory {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  couple   Couple         @relation("CoupleMemories", fields: [coupleId], references: [id], map: "memories_couple_fkey", onDelete: Cascade)
-  visit    Visit?         @relation("VisitMemory", fields: [visitId], references: [id], map: "memories_visit_fkey", onDelete: Cascade)
-  dateIdea DateIdea?      @relation("DateIdeaMemory", fields: [dateIdeaId], references: [id], map: "memories_date_idea_fkey", onDelete: Cascade)
+  couple   Couple        @relation("CoupleMemories", fields: [coupleId], references: [id], map: "memories_couple_fkey", onDelete: Cascade)
+  visit    Visit?        @relation("VisitMemory", fields: [visitId], references: [id], map: "memories_visit_fkey", onDelete: Cascade)
+  dateIdea DateIdea?     @relation("DateIdeaMemory", fields: [dateIdeaId], references: [id], map: "memories_date_idea_fkey", onDelete: Cascade)
   images   MemoryImage[]
 
   @@map("memories")
