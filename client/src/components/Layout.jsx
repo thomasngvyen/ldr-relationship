@@ -36,6 +36,7 @@ export default function Layout({ children }) {
       link: '/date-ideas',
     },
     { label: 'Memories', ariaLabel: 'Browse shared memories and photos', link: '/memories' },
+    { label: 'Feelings', ariaLabel: 'Share how you are feeling', link: '/feelings' },
     { label: 'Pair', ariaLabel: 'Connect with your partner', link: '/pair' },
     {
       label: isMobile ? 'Logout' : 'Log out',

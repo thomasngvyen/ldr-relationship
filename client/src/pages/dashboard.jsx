@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { client } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import CountdownTimer from '../components/CountdownTimer'
+import EnableNotifications from '../components/EnableNotifications'
 import ErrorBanner from '../components/ErrorBanner'
 import LoadingSpinner from '../components/LoadingSpinner'
 import DashboardOrbs from '../components/DashboardOrbs'
@@ -211,6 +212,8 @@ export default function Dashboard() {
               Paired with{' '}
               <span className="dashboard-page__accent">{status.partner?.displayName}</span>.
             </p>
+
+            <EnableNotifications />
 
             <ErrorBanner message={visitsError} onDismiss={() => setVisitsError('')} />
 

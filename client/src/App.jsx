@@ -10,6 +10,7 @@ import Moods from './pages/moods'
 import ManageMessages from './pages/ManageMessages'
 import DateIdeas from './pages/dateIdeas'
 import Memories from './pages/memories'
+import Feelings from './pages/feelings'
 
 function App() {
   return (
@@ -71,6 +72,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Memories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/feelings"
+          element={
+            <ProtectedRoute>
+              <Feelings />
             </ProtectedRoute>
           }
         />

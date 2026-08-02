@@ -13,6 +13,17 @@ model User {
   displayName  String   @map("display_name")
   createdAt    DateTime @default(now()) @map("created_at")
 
+<<<<<<< HEAD
+  coupleAsA         Couple?            @relation("UserA")
+  coupleAsB         Couple?            @relation("UserB")
+  moodMessages      MoodMessage[]      @relation("UserMoodMessages")
+  dateIdeas         DateIdea[]         @relation("UserDateIdeas")
+  dateIdeaVotes     DateIdeaVote[]     @relation("UserDateIdeaVotes")
+  visits            Visit[]            @relation("VisitingPartner")
+  memoryImages      MemoryImage[]      @relation("UserMemoryImages")
+  feelings          Feeling[]          @relation("UserFeelings")
+  pushSubscriptions PushSubscription[]
+=======
   coupleAsA     Couple?         @relation("UserA")
   coupleAsB     Couple?         @relation("UserB")
   moodMessages  MoodMessage[]   @relation("UserMoodMessages")
@@ -20,6 +31,7 @@ model User {
   dateIdeaVotes DateIdeaVote[]  @relation("UserDateIdeaVotes")
   visits        Visit[]         @relation("VisitingPartner")
   memoryImages  MemoryImage[]   @relation("UserMemoryImages")
+>>>>>>> 19fad7b85246783c22ed8cdc290639aa706f1450
 
   @@map("users")
 }
@@ -38,6 +50,10 @@ model Couple {
   dateIdeas    DateIdea[]    @relation("CoupleDateIdeas")
   moodMessages MoodMessage[] @relation("CoupleMoodMessages")
   memories     Memory[]      @relation("CoupleMemories")
+<<<<<<< HEAD
+  feelings     Feeling[]     @relation("CoupleFeelings")
+=======
+>>>>>>> 19fad7b85246783c22ed8cdc290639aa706f1450
 
   @@map("couples")
 }
@@ -165,4 +181,33 @@ model MemoryImage {
   uploadedBy User   @relation("UserMemoryImages", fields: [uploadedById], references: [id], map: "memory_images_user_fkey")
 
   @@map("memory_images")
+}
+
+model Feeling {
+  id        String   @id @default(cuid())
+  feeling   String
+  reason    String?
+  coupleId  String   @map("couple_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  couple Couple @relation("CoupleFeelings", fields: [coupleId], references: [id], map: "feelings_couple_fkey", onDelete: Cascade)
+  user   User   @relation("UserFeelings", fields: [userId], references: [id], map: "feelings_user_fkey")
+
+  @@map("feelings")
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_subscriptions")
 }
