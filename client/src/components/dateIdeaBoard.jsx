@@ -149,6 +149,29 @@ export default function DateIdeaBoard() {
 
   /**
    * @param {DateIdea} idea
+   * @param {string | null} plannedDate
+   */
+  async function handlePlannedDateChange(idea, plannedDate) {
+    setUpdatingId(idea.id)
+    setError(null)
+
+    try {
+      const data = await client(`/api/dateIdeas/${idea.id}`, {
+        method: 'PATCH',
+        body: { plannedDate },
+      })
+      setIdeas((prev) =>
+        prev.map((item) => (item.id === idea.id ? data.dateIdea : item)),
+      )
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save the planned date')
+    } finally {
+      setUpdatingId(null)
+    }
+  }
+
+  /**
+   * @param {DateIdea} idea
    */
   async function handleDelete(idea) {
     setDeletingId(idea.id)
@@ -217,6 +240,7 @@ export default function DateIdeaBoard() {
               onEdit={startEdit}
               onDelete={handleDelete}
               onStatusChange={handleStatusChange}
+              onPlannedDateChange={handlePlannedDateChange}
               voting={votingId === idea.id}
               updating={updatingId === idea.id}
               deleting={deletingId === idea.id}

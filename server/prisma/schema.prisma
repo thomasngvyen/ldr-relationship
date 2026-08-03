@@ -88,15 +88,18 @@ model MoodMessage {
 }
 
 model DateIdea {
-  id          String           @id @default(cuid())
-  title       String
-  description String
-  category    DateIdeaCategory
-  status      DateIdeaStatus   @default(IDEA)
-  coupleId    String           @map("couple_id")
-  userId      String           @map("user_id")
-  createdAt   DateTime         @default(now()) @map("created_at")
-  updatedAt   DateTime         @updatedAt @map("updated_at")
+  id                 String           @id @default(cuid())
+  title              String
+  description        String
+  category           DateIdeaCategory
+  status             DateIdeaStatus   @default(IDEA)
+  plannedDate        DateTime?        @map("planned_date")
+  dayBeforeNotifiedAt DateTime?       @map("day_before_notified_at")
+  dayOfNotifiedAt    DateTime?        @map("day_of_notified_at")
+  coupleId           String           @map("couple_id")
+  userId             String           @map("user_id")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
 
   couple Couple         @relation("CoupleDateIdeas", fields: [coupleId], references: [id], map: "date_ideas_couple_fkey")
   user   User           @relation("UserDateIdeas", fields: [userId], references: [id], map: "date_ideas_user_fkey")

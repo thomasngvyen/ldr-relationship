@@ -8,10 +8,39 @@ import './DateIdeaComponents.css'
  * @property {string} description
  * @property {string} category
  * @property {'IDEA' | 'VOTED' | 'SELECTED' | 'COMPLETED'} status
+ * @property {string | null} [plannedDate]
  * @property {number} voteCount
  * @property {boolean} votedByCurrentUser
  * @property {{ id: string, displayName: string } | undefined} [user]
  */
+
+/**
+ * @param {string | null | undefined} iso
+ * @returns {string}
+ */
+function toInputDate(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+  return d.toISOString().slice(0, 10)
+}
+
+/**
+ * @param {string | null | undefined} iso
+ * @returns {string}
+ */
+function formatPlannedLabel(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+  return d.toLocaleDateString(undefined, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
+}
 
 /**
  * @param {Object} props
@@ -20,6 +49,7 @@ import './DateIdeaComponents.css'
  * @param {(idea: DateIdea) => void} [props.onEdit]
  * @param {(idea: DateIdea) => void} [props.onDelete]
  * @param {(idea: DateIdea, status: string) => void} [props.onStatusChange]
+ * @param {(idea: DateIdea, plannedDate: string | null) => void} [props.onPlannedDateChange]
  * @param {boolean} [props.voting]
  * @param {boolean} [props.deleting]
  * @param {boolean} [props.updating]
@@ -30,12 +60,15 @@ export default function DateIdeaCard({
   onEdit,
   onDelete,
   onStatusChange,
+  onPlannedDateChange,
   voting = false,
   deleting = false,
   updating = false,
 }) {
   const isCompleted = idea.status === 'COMPLETED'
   const isSelected = idea.status === 'SELECTED'
+  const showDate = isSelected || isCompleted
+  const plannedValue = toInputDate(idea.plannedDate)
 
   return (
     <article className={`idea-card${isCompleted ? ' idea-card--completed' : ''}`}>
@@ -59,7 +92,31 @@ export default function DateIdeaCard({
       <p className="idea-card__description">{idea.description}</p>
 
       {idea.user?.displayName ? (
-        <p className="idea-card__meta">Added by <strong>{idea.user.displayName}</strong></p>
+        <p className="idea-card__meta">
+          Added by <strong>{idea.user.displayName}</strong>
+        </p>
+      ) : null}
+
+      {showDate && idea.plannedDate ? (
+        <p className="idea-card__planned">
+          Planned for <strong>{formatPlannedLabel(idea.plannedDate)}</strong>
+        </p>
+      ) : null}
+
+      {showDate && onPlannedDateChange && isSelected ? (
+        <label className="idea-card__date-field">
+          <span className="idea-card__date-label">Date</span>
+          <input
+            type="date"
+            className="idea-card__date-input"
+            value={plannedValue}
+            disabled={updating}
+            onChange={(event) => {
+              const value = event.target.value
+              onPlannedDateChange(idea, value || null)
+            }}
+          />
+        </label>
       ) : null}
 
       {(onStatusChange || onEdit || onDelete) && (
@@ -69,8 +126,12 @@ export default function DateIdeaCard({
               type="button"
               className="idea-card__btn idea-card__btn--primary"
               onClick={() => onStatusChange(idea, isSelected ? 'COMPLETED' : 'SELECTED')}
-              disabled={updating || (!isSelected && idea.voteCount !==2)}
-              title={!isSelected && idea.voteCount !==2 ? 'This idea must have exactly 2 votes to be marked as selected' : undefined}
+              disabled={updating || (!isSelected && idea.voteCount !== 2)}
+              title={
+                !isSelected && idea.voteCount !== 2
+                  ? 'This idea must have exactly 2 votes to be marked as selected'
+                  : undefined
+              }
             >
               {updating ? 'Saving…' : isSelected ? 'Mark done' : 'Plan it'}
             </button>

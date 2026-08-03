@@ -123,6 +123,39 @@
   opacity: 0.75;
 }
 
+.idea-card__planned {
+  margin: 0;
+  color: #be185d;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.idea-card__date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.idea-card__date-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #be185d;
+}
+
+.idea-card__date-input {
+  width: 100%;
+  max-width: 14rem;
+  border: 1px solid rgba(244, 114, 182, 0.35);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #831843;
+  background: rgba(255, 255, 255, 0.9);
+}
+
 .idea-card__actions {
   display: flex;
   flex-wrap: wrap;

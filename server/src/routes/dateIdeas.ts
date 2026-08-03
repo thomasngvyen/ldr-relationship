@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import prisma from '../lib/prisma';
+import { toVisitDate } from '../lib/calendarDates';
 import { zodValidator } from '../middleware/zodValidator';
 import {
   createDateIdeaSchema,
@@ -148,28 +149,84 @@ router.patch('/:id', zodValidator(updateDateIdeaSchema), async (req, res) => {
 
     const existing = await prisma.dateIdea.findFirst({
       where: { id, coupleId: couple.id },
-      select: { id: true, userId: true },
+      select: {
+        id: true,
+        userId: true,
+        status: true,
+        plannedDate: true,
+      },
     });
 
     if (!existing) {
       return res.status(404).json({ error: 'Date idea not found' });
     }
 
-    const bodyKeys = Object.keys(req.body);
-    const onlyStatus =
-      bodyKeys.length === 1 && req.body.status !== undefined;
+    const {
+      title,
+      description,
+      category,
+      status,
+      plannedDate,
+    } = req.body as {
+      title?: string;
+      description?: string;
+      category?: string;
+      status?: string;
+      plannedDate?: string | null;
+    };
+
+    const contentKeys = [title, description, category].filter((v) => v !== undefined);
     const isCreator = existing.userId === userID;
 
-    // Anyone in the couple can move status; only the creator edits content
-    if (!isCreator && !onlyStatus) {
+    // Anyone in the couple can move status / set planned date; only creator edits content
+    if (!isCreator && contentKeys.length > 0) {
       return res.status(403).json({
         error: 'Only the person who added this idea can edit it',
       });
     }
 
+    const nextStatus = status ?? existing.status;
+    /** @type {Record<string, unknown>} */
+    const data: Record<string, unknown> = {};
+
+    if (title !== undefined) data.title = title;
+    if (description !== undefined) data.description = description;
+    if (category !== undefined) data.category = category;
+    if (status !== undefined) data.status = status;
+
+    if (plannedDate !== undefined) {
+      if (plannedDate === null) {
+        data.plannedDate = null;
+        data.dayBeforeNotifiedAt = null;
+        data.dayOfNotifiedAt = null;
+      } else {
+        if (nextStatus !== 'SELECTED' && nextStatus !== 'COMPLETED') {
+          return res.status(400).json({
+            error: 'Set the idea to Planned before adding a date',
+          });
+        }
+        const nextPlanned = toVisitDate(plannedDate);
+        data.plannedDate = nextPlanned;
+        const prevKey = existing.plannedDate
+          ? existing.plannedDate.toISOString().slice(0, 10)
+          : null;
+        if (prevKey !== plannedDate) {
+          data.dayBeforeNotifiedAt = null;
+          data.dayOfNotifiedAt = null;
+        }
+      }
+    }
+
+    // Returning to the backlog clears schedule
+    if (status === 'IDEA') {
+      data.plannedDate = null;
+      data.dayBeforeNotifiedAt = null;
+      data.dayOfNotifiedAt = null;
+    }
+
     const dateIdea = await prisma.dateIdea.update({
       where: { id: existing.id },
-      data: req.body,
+      data,
       include: ideaInclude,
     });
 

@@ -17,6 +17,10 @@ import feelingsRouter from './routes/feelings';
 import pushRouter from './routes/push';
 import rateLimit from './middleware/rateLimit';
 import { MEMORY_UPLOAD_DIR } from './lib/memoryUploads';
+import {
+  processDateIdeaReminders,
+  startDateIdeaReminderScheduler,
+} from './lib/dateIdeaReminders';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -46,6 +50,21 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
 
+/** For Render Cron Jobs / external ping when the free dyno sleeps */
+app.post('/api/cron/date-reminders', async (req, res) => {
+  const secret = process.env.CRON_SECRET?.trim();
+  if (!secret || req.headers['x-cron-secret'] !== secret) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const result = await processDateIdeaReminders();
+    return res.status(200).json({ ok: true, ...result });
+  } catch {
+    return res.status(500).json({ error: 'Reminder job failed' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  startDateIdeaReminderScheduler();
 });
